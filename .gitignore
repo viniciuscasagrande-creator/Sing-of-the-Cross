@@ -3,3 +3,6 @@ __pycache__/
 .env
 vms.json
 .venv/
+
+.vercel
+.env*
