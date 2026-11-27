@@ -1,14 +1,19 @@
 @echo off
-title SING OF THE CROSS (SOTC) - Multi-Cloud Control Center
-echo =================================================================
-echo   SING OF THE CROSS (SOTC) - MULTI-CLOUD INFRASTRUCTURE MONITOR
-echo   Abrindo http://127.0.0.1:8765 ...
-echo =================================================================
+title SING OF THE CROSS (SOTC) - V0.2 Dark Gothic Edition
 cd /d "%~dp0"
+echo =========================================================
+echo   SING OF THE CROSS - MULTI-CLOUD COMMAND CENTER (V0.2)
+echo   URL: http://127.0.0.1:8765
+echo =========================================================
 start "" "http://127.0.0.1:8765"
 if exist "C:\laragon\bin\python\python-3.13\python.exe" (
-    "C:\laragon\bin\python\python-3.13\python.exe" app.py
+  "C:\laragon\bin\python\python-3.13\python.exe" app.py
 ) else (
-    "C:\Program Files\nodejs\node.exe" server.js
+  where py >nul 2>nul
+  if errorlevel 1 (
+    python app.py
+  ) else (
+    py -3 app.py
+  )
 )
 pause

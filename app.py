@@ -21,9 +21,9 @@ VALID_CLOUDS = ("Google Cloud", "AWS", "Azure", "Oracle Cloud")
 
 REMOTE_PROBE_SCRIPT = (
     "export LC_ALL=C; "
-    "if ps -eo args 2>/dev/null | grep -E '[.]vscode-server|[.]vscode-remote|[.]vscode-server-insiders|[.]antigravity-server|code-tunnel' >/dev/null; "
+    "if ps -eo args 2>/dev/null | grep -E '[.]vscode-server|[.]vscode-remote|[.]vscode-server-insiders|[.]antigravity-server|[c]ode-tunnel' >/dev/null; "
     "then SRV='present'; else SRV='not_detected'; fi; "
-    "SESS=$(ps -eo args 2>/dev/null | grep -E '(vscode-server|antigravity-server).*extensionHost|bootstrap-fork.*--type=extensionHost' | grep -v grep | wc -l); "
+    "SESS=$(ps -eo args 2>/dev/null | grep -E '([.]vscode-server|[.]antigravity-server).*extensionHost|[b]ootstrap-fork.*--type=extensionHost' | wc -l); "
     "SSH_PTS=$(who 2>/dev/null | wc -l); "
     "CPU=$(top -bn1 2>/dev/null | grep 'Cpu(s)' | awk '{print int(100 - $8)}'); "
     "RAM=$(free -m 2>/dev/null | awk '/Mem:/ { printf(\"%d\", ($3/$2)*100) }'); "
