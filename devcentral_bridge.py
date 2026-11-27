@@ -129,6 +129,40 @@ def ensure_sotc_neon_schema():
         )
         """
     )
+    neon_query(
+        """
+        CREATE TABLE IF NOT EXISTS sotc_incidents (
+            id SERIAL PRIMARY KEY,
+            incident_code TEXT UNIQUE NOT NULL,
+            vm_ssh TEXT NOT NULL,
+            title TEXT NOT NULL,
+            severity TEXT NOT NULL DEFAULT 'HIGH',
+            status TEXT NOT NULL DEFAULT 'OPEN',
+            owner TEXT NOT NULL DEFAULT 'SRE On-Call (Vinicius)',
+            sla_minutes INTEGER NOT NULL DEFAULT 60,
+            opened_ts BIGINT NOT NULL,
+            resolved_ts BIGINT,
+            mttr_minutes NUMERIC(10,2),
+            root_cause TEXT DEFAULT '',
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+        """
+    )
+    neon_query(
+        """
+        CREATE TABLE IF NOT EXISTS sotc_hourly_rollups (
+            hour_bucket BIGINT NOT NULL,
+            ssh TEXT NOT NULL,
+            samples_count INTEGER NOT NULL DEFAULT 1,
+            avg_cpu NUMERIC(6,2) NOT NULL DEFAULT 0,
+            max_cpu NUMERIC(6,2) NOT NULL DEFAULT 0,
+            avg_ram NUMERIC(6,2) NOT NULL DEFAULT 0,
+            avg_disk NUMERIC(6,2) NOT NULL DEFAULT 0,
+            avg_latency_ms NUMERIC(10,2) NOT NULL DEFAULT 0,
+            PRIMARY KEY (hour_bucket, ssh)
+        )
+        """
+    )
     _SCHEMA_READY = True
 
 
@@ -195,6 +229,28 @@ def push_sentinel_cycle_to_neon(agent_id, hostname, os_name, interval_sec, vms_r
                 "INSERT INTO sotc_vm_history (ts, ssh, payload) VALUES ($1, $2, $3::jsonb)",
                 [now, ssh_alias, payload_json],
             )
+            hour_bucket = (now // 3600) * 3600
+            cpu_v = float(r.get("cpu_pct") or 0)
+            ram_v = float(r.get("ram_pct") or 0)
+            try:
+                disk_v = float(str(r.get("disk_pct") or "0").replace("%", ""))
+            except ValueError:
+                disk_v = 0.0
+            lat_v = float(r.get("latency_ms") or 0)
+            neon_query(
+                """
+                INSERT INTO sotc_hourly_rollups (hour_bucket, ssh, samples_count, avg_cpu, max_cpu, avg_ram, avg_disk, avg_latency_ms)
+                VALUES ($1, $2, 1, $3, $3, $4, $5, $6)
+                ON CONFLICT (hour_bucket, ssh) DO UPDATE
+                SET samples_count = sotc_hourly_rollups.samples_count + 1,
+                    avg_cpu = ROUND(((sotc_hourly_rollups.avg_cpu * sotc_hourly_rollups.samples_count + EXCLUDED.avg_cpu) / (sotc_hourly_rollups.samples_count + 1))::numeric, 2),
+                    max_cpu = GREATEST(sotc_hourly_rollups.max_cpu, EXCLUDED.max_cpu),
+                    avg_ram = ROUND(((sotc_hourly_rollups.avg_ram * sotc_hourly_rollups.samples_count + EXCLUDED.avg_ram) / (sotc_hourly_rollups.samples_count + 1))::numeric, 2),
+                    avg_disk = ROUND(((sotc_hourly_rollups.avg_disk * sotc_hourly_rollups.samples_count + EXCLUDED.avg_disk) / (sotc_hourly_rollups.samples_count + 1))::numeric, 2),
+                    avg_latency_ms = ROUND(((sotc_hourly_rollups.avg_latency_ms * sotc_hourly_rollups.samples_count + EXCLUDED.avg_latency_ms) / (sotc_hourly_rollups.samples_count + 1))::numeric, 2)
+                """,
+                [hour_bucket, ssh_alias, cpu_v, ram_v, disk_v, lat_v],
+            )
 
         if alerts_rows is not None:
             neon_query("DELETE FROM sotc_alerts WHERE ts < $1", [now - 7 * 86400])
@@ -205,6 +261,25 @@ def push_sentinel_cycle_to_neon(agent_id, hostname, os_name, interval_sec, vms_r
                     VALUES ($1, $2, $3, $4, $5, $6, false)
                     """,
                     [now, a.get("vm_ssh", ""), a.get("metric", ""), a.get("value", ""), a.get("severity", "WARNING"), a.get("message", "")],
+                )
+                inc_code = f"INC-{a.get('vm_ssh','vm').upper()}-{a.get('metric','SYS').replace(' ','_')}-{time.strftime('%Y%m%d')}"
+                neon_query(
+                    """
+                    INSERT INTO sotc_incidents (incident_code, vm_ssh, title, severity, status, owner, sla_minutes, opened_ts, root_cause)
+                    VALUES ($1, $2, $3, $4, 'OPEN', 'SRE On-Call (Vinicius)', $5, $6, $7)
+                    ON CONFLICT (incident_code) DO UPDATE
+                    SET severity = EXCLUDED.severity,
+                        title = EXCLUDED.title
+                    """,
+                    [
+                        inc_code,
+                        a.get("vm_ssh", "radar-producao"),
+                        a.get("message", "Alerta automático detectado pelo Sentinel"),
+                        "CRITICAL" if a.get("severity") == "CRITICAL" else "HIGH",
+                        30 if a.get("severity") == "CRITICAL" else 120,
+                        now,
+                        f"Métrica {a.get('metric')} atingiu {a.get('value')} durante coleta contínua.",
+                    ],
                 )
 
         neon_query("DELETE FROM sotc_vm_history WHERE ts < $1", [now - 30 * 86400])

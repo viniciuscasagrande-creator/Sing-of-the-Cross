@@ -27,6 +27,16 @@ def cloud_args(vm, action):
     raise ValueError('Cloud não suportada')
 
 DIAG={'processes':'ps -eo pid,comm,%cpu,%mem --sort=-%cpu | head -26','services':'systemctl list-units --type=service --state=running --no-pager --plain','network':'ip -s link; ss -s','storage':'df -hT; lsblk','logs':'journalctl -n 60 --no-pager -p warning','system':'uname -a; uptime; free -h'}
+_LAST_ACTION_TS = {}
+
+def check_rate_limit(key, cooldown_sec=10):
+    now = time.monotonic()
+    last = _LAST_ACTION_TS.get(key, 0)
+    if now - last < cooldown_sec:
+        rem = round(cooldown_sec - (now - last), 1)
+        raise ValueError(f'Proteção anti-repetição (Cooldown RBAC): aguarde {rem}s antes de repetir esta operação crítica.')
+    _LAST_ACTION_TS[key] = now
+
 def ssh(vm,cmd):
     return run(['ssh','-o','BatchMode=yes','-o','StrictHostKeyChecking=yes','-o','ConnectTimeout=5','-o','ClearAllForwardings=yes','-o','RequestTTY=no',field(vm,'ssh'),cmd])
 
@@ -48,6 +58,7 @@ def execute(vm,item):
         service=item.get('service','')
         if not isinstance(service,str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.@-]{0,100}\.service',service): raise ValueError('Informe unidade systemd terminada em .service')
         if item.get('confirm')!=alias+' '+service: raise ValueError('Confirmação incorreta')
+        check_rate_limit(f'{alias}:restart:{service}', cooldown_sec=12)
         result=ssh(vm,'sudo -n systemctl restart -- '+service+' && systemctl is-active -- '+service)
     else: raise ValueError('Ação desconhecida')
     audit(alias,action,result); return result

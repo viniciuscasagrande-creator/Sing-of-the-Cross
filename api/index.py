@@ -57,6 +57,16 @@ class handler(BaseHTTPRequestHandler):
                 rows = devcentral_bridge.fetch_vm_snapshots_from_neon()
                 data = oracle.analyze_infrastructure(rows)
                 self.send_data(json.dumps(data, ensure_ascii=False).encode("utf-8"))
+            elif path == "/api/command-center":
+                rows = devcentral_bridge.fetch_vm_snapshots_from_neon()
+                try: dc_ov = devcentral_bridge.fetch_overview()
+                except Exception: dc_ov = {}
+                try: sent_st = devcentral_bridge.fetch_sentinel_status()
+                except Exception: sent_st = {}
+                try: aud = devcentral_bridge.fetch_audit_from_neon(50)
+                except Exception: aud = []
+                suite = oracle.build_command_center_suite(rows, dc_ov, sent_st, aud)
+                self.send_data(json.dumps(suite, ensure_ascii=False).encode("utf-8"))
             elif path == "/api/aliases":
                 self.send_data(b'["radar-producao"]')
             else:

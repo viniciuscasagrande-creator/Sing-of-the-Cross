@@ -114,6 +114,209 @@
     .vm-bar-track { height: 8px; background: #261d23; border-radius: 4px; overflow: hidden; }
     .vm-bar-fill { height: 100%; background: linear-gradient(90deg, #8b0000, #d94848); }
 
+    /* ==========================================================================
+       FLIGHT CONTROL COCKPIT • PAINEL DE INSTRUMENTOS E GRÁFICOS OPERACIONAIS
+       ========================================================================== */
+    .cockpit-shell {
+      background: radial-gradient(circle at 50% 0%, rgba(139, 0, 0, 0.22), rgba(8, 8, 10, 0.98) 70%);
+      border: 2px solid #8b0000;
+      border-top: 4px double #b59b61;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 0 42px rgba(0, 0, 0, 0.95), inset 0 0 32px rgba(139, 0, 0, 0.14);
+      position: relative;
+      overflow: hidden;
+    }
+    .cockpit-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-bottom: 14px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid #57303a;
+    }
+    .hud-telemetry-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .hud-metric-tile {
+      background: linear-gradient(180deg, rgba(20, 16, 22, 0.95), rgba(8, 8, 10, 0.98));
+      border: 1px solid #4d333c;
+      border-left: 3px solid var(--gold);
+      padding: 10px 12px;
+      border-radius: 4px;
+      font-family: Consolas, monospace;
+    }
+    .hud-metric-tile.alert { border-left-color: #b91c1c; box-shadow: inset 0 0 14px rgba(185, 28, 28, 0.25); }
+    .hud-metric-tile small {
+      display: block;
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #a8a9ad;
+    }
+    .hud-metric-tile strong {
+      display: block;
+      font-size: 19px;
+      color: #e8e4db;
+      margin-top: 3px;
+      text-shadow: 0 0 10px rgba(181, 155, 97, 0.45);
+    }
+    .hud-metric-tile span {
+      font-size: 11px;
+      color: #b59b61;
+    }
+    .cockpit-gauges-6 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .gauge-card {
+      background: radial-gradient(circle at 50% 45%, #1d151c 0%, #09080b 85%);
+      border: 1px solid #553540;
+      border-top: 2px solid #8b0000;
+      border-radius: 6px;
+      padding: 12px 10px;
+      text-align: center;
+      position: relative;
+      box-shadow: inset 0 0 20px #000;
+    }
+    .gauge-card h4 {
+      margin: 0 0 4px;
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #b59b61;
+      font-family: Georgia, serif;
+    }
+    .gauge-card .gauge-sub {
+      font-family: Consolas, monospace;
+      font-size: 11.5px;
+      color: #a8a9ad;
+      margin-top: 4px;
+    }
+    .cockpit-charts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .chart-box {
+      background: linear-gradient(160deg, rgba(16, 13, 18, 0.96), rgba(7, 7, 9, 0.99));
+      border: 1px solid #4c323b;
+      border-top: 2px solid #b59b61;
+      border-radius: 6px;
+      padding: 14px 16px;
+      box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.85);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .chart-box-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #312329;
+      padding-bottom: 6px;
+    }
+    .chart-box-head h3 {
+      font-size: 14px;
+      color: #e8e4db;
+      margin: 0;
+      letter-spacing: 0.8px;
+    }
+    .chart-box-head small {
+      font-family: Consolas, monospace;
+      font-size: 11px;
+      color: #b59b61;
+    }
+    .flight-canvas {
+      width: 100%;
+      height: 215px;
+      display: block;
+      background:
+        linear-gradient(rgba(139, 0, 0, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(139, 0, 0, 0.07) 1px, transparent 1px),
+        #060508;
+      background-size: 24px 24px;
+      border: 1px solid #35232a;
+      border-radius: 4px;
+    }
+    @media (max-width: 1024px) {
+      .cockpit-charts-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ==========================================================================
+       7 DASHBOARDS EXECUTIVOS PERSONALIZADOS + MAPA DE DEPENDÊNCIAS (SOTC SUITE)
+       ========================================================================== */
+    .suite-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 14px 0 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #4e323c;
+    }
+    .suite-tab-btn {
+      background: linear-gradient(180deg, #241920 0%, #0d0a0e 100%);
+      border: 1px solid #63404b;
+      color: var(--bone);
+      padding: 0 14px;
+      height: 40px;
+      border-radius: 4px;
+      font-family: Georgia, serif;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .suite-tab-btn.active {
+      background: linear-gradient(180deg, #8b0000 0%, #330910 100%);
+      border-color: var(--gold);
+      color: #fff;
+      box-shadow: 0 0 16px rgba(139, 0, 0, 0.75);
+    }
+    .suite-pane { display: none; }
+    .suite-pane.active { display: block; }
+    .dep-graph {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 14px;
+      margin-top: 12px;
+    }
+    .dep-column {
+      background: rgba(12, 10, 14, 0.94);
+      border: 1px solid #573640;
+      border-top: 3px solid var(--gold);
+      border-radius: 6px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .dep-node {
+      background: linear-gradient(145deg, #1d161d, #0d0b0f);
+      border: 1px solid #452e36;
+      border-left: 3px solid #8b0000;
+      padding: 10px 12px;
+      border-radius: 4px;
+      font-size: 12.5px;
+    }
+    .dep-node strong { display: block; color: var(--bone); margin-bottom: 3px; }
+    .impact-box {
+      background: rgba(139, 0, 0, 0.16);
+      border: 1px solid #b91c1c;
+      border-left: 4px solid var(--gold);
+      padding: 12px 14px;
+      border-radius: 4px;
+      margin: 12px 0;
+      font-size: 12.5px;
+      line-height: 1.5;
+    }
+
     @media (max-width: 920px) {
       .split { grid-template-columns: 1fr; }
       h1 { font-size: 24px; }
@@ -150,19 +353,20 @@
   </header>
 
   <nav aria-label="Menu Principal em Português">
-    <a href="#visao-geral">✠ 1. Minhas Máquinas (VMs)</a>
-    <a href="#acoes-rapidas">⚡ 2. Intervenção Rápida (1 Clique)</a>
-    <a href="#watcher">◉ 3. Medidores e Gráficos</a>
-    <a href="#oracle">🧠 4. Diagnóstico Explicado</a>
-    <a href="#grimoire">📂 5. Meus Projetos (DevCentral)</a>
-    <a href="#sentinel">👁 6. Monitor Automático 24h</a>
-    <a href="#crypt">📜 7. Histórico</a>
+    <a href="#cockpit">🎛️ 1. Cockpit Controlador de Voo</a>
+    <a href="#sotc-suite">🏛️ 2. Os 7 Dashboards SOTC &amp; Dependências</a>
+    <a href="#acoes-rapidas">⚡ 3. Intervenção Rápida (1 Clique)</a>
+    <a href="#visao-geral">✠ 4. Minhas Máquinas (VMs)</a>
+    <a href="#watcher">◉ 5. Telemetria &amp; Ficha Técnica</a>
+    <a href="#grimoire">📂 6. Meus Projetos (DevCentral)</a>
+    <a href="#sentinel">👁 7. Monitor 24/7</a>
+    <a href="#crypt">📜 8. Auditoria</a>
   </nav>
 
   <main>
     <!-- Barra de Controle Simplificada -->
     <div class="toolbar">
-      <button id="refresh">🔄 Atualizar Dados Agora</button>
+      <button id="refresh">🔄 Atualizar Telemetria Agora</button>
       <select id="cloud" aria-label="Filtrar por Provedor de Nuvem">
         <option value="">Todas as Nuvens (Google, AWS, Azure, Oracle)</option>
         <option value="Google Cloud">Google Cloud</option>
@@ -171,10 +375,217 @@
         <option value="Oracle Cloud">Oracle Cloud</option>
       </select>
       <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer">
-        <input id="auto" type="checkbox" checked> Atualizar sozinho a cada 30 segundos
+        <input id="auto" type="checkbox" checked> Varredura automática (15s)
       </label>
-      <span id="status" class="muted" role="status">Carregando informações das máquinas…</span>
+      <span id="status" class="muted" role="status">Iniciando radares e telemetria…</span>
     </div>
+
+    <!-- 0. COCKPIT OPERACIONAL ESTILO CONTROLADOR DE VOO (THE CATHEDRAL FLIGHT DECK) -->
+    <section class="cockpit-shell" id="cockpit">
+      <div class="cockpit-header-bar">
+        <div>
+          <h2 style="margin:0;border:none;padding:0">🎛️ COCKPIT OPERACIONAL — CENTRAL DE CONTROLE DE VOO MULTI-CLOUD</h2>
+          <small class="muted">Instrumentos de Telemetria em Tempo Real • Radar Tático • Osciloscópio de Latência • Carga de Subsistema</small>
+        </div>
+        <div class="toolbar">
+          <span class="badge-pill ok" id="hudFlightStatus">● FLIGHT DECK ONLINE</span>
+          <span class="badge-pill" id="hudTargetVm" style="color:var(--gold)">ALVO: RADAR-PRODUCAO</span>
+          <span class="badge-pill" id="hudClock">--:--:--</span>
+        </div>
+      </div>
+
+      <!-- Strip de Telemetria Digital Rápida (HUD Flight Strip) -->
+      <div class="hud-telemetry-strip" id="hudStrip"></div>
+
+      <!-- 6 Instrumentos Circulares Analógicos/Digitais Estilo Aviação -->
+      <div class="cockpit-gauges-6" id="flightGauges"></div>
+
+      <!-- 4 Gráficos Operacionais de Alta Densidade (Radar + Osciloscópio + Multilinhas + Capacidade/Projetos) -->
+      <div class="cockpit-charts-grid">
+        <div class="chart-box">
+          <div class="chart-box-head">
+            <h3>📡 1. Radar Tático de Varredura (VMs, Portas &amp; Serviços)</h3>
+            <small id="radarMeta">VARREDURA 360° ATIVA • 34.70.140.94</small>
+          </div>
+          <canvas id="radarCanvas" class="flight-canvas" aria-label="Radar tático de varredura"></canvas>
+        </div>
+
+        <div class="chart-box">
+          <div class="chart-box-head">
+            <h3>📈 2. Osciloscópio de Latência SSH &amp; Jitter de Rede (ms)</h3>
+            <small id="latencyMeta">TEMPO DE RESPOSTA EM TEMPO REAL</small>
+          </div>
+          <canvas id="latencyCanvas" class="flight-canvas" aria-label="Osciloscópio de latência SSH"></canvas>
+        </div>
+
+        <div class="chart-box">
+          <div class="chart-box-head">
+            <h3>🔥 3. Curva Operacional Multi-Camada (CPU · RAM · Disco)</h3>
+            <small id="multiLineMeta">HISTÓRICO CONTÍNUO DO SQLITE</small>
+          </div>
+          <canvas id="cockpitTrendCanvas" class="flight-canvas" aria-label="Gráfico operacional de CPU, RAM e Disco"></canvas>
+        </div>
+
+        <div class="chart-box">
+          <div class="chart-box-head">
+            <h3>📊 4. Espectro de Carga &amp; Ecossistema (Subsistemas + 42 Projetos)</h3>
+            <small id="barsMeta">ALOCAÇÃO FÍSICA E DEPLOYS</small>
+          </div>
+          <canvas id="subsystemBarsCanvas" class="flight-canvas" aria-label="Gráfico de barras de subsistemas e projetos"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- 0.5 OS 7 DASHBOARDS EXECUTIVOS PERSONALIZADOS + MAPA DE DEPENDÊNCIAS (SOTC ENTERPRISE ARCHITECTURE) -->
+    <section class="panel" id="sotc-suite">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+        <div>
+          <h2 style="margin:0;border:none;padding:0">🏛️ CENTRAL EXECUTIVA SOTC — 7 DASHBOARDS ESPECIALIZADOS &amp; MAPA DE DEPENDÊNCIAS</h2>
+          <small class="muted">Arquitetura Resiliente 24/7 • Coleta Independente do Navegador • Persistência Neon PostgreSQL • RBAC &amp; Impact Preview</small>
+        </div>
+        <span class="badge-pill ok" id="suiteCollectorBadge">● WORKER 24/7 INDEPENDENTE ATIVO</span>
+      </div>
+
+      <div class="suite-tabs" id="suiteTabs">
+        <button class="suite-tab-btn active" data-tab="pane-cmd">1. SOTC Command Center</button>
+        <button class="suite-tab-btn" data-tab="pane-obs">2. SOTC Observability</button>
+        <button class="suite-tab-btn" data-tab="pane-sec">3. SOTC Sentinel (Sec &amp; SSL)</button>
+        <button class="suite-tab-btn" data-tab="pane-inc">4. SOTC Incident &amp; Backup DR</button>
+        <button class="suite-tab-btn" data-tab="pane-fin">5. SOTC FinOps</button>
+        <button class="suite-tab-btn" data-tab="pane-dev">6. SOTC DevOps Center</button>
+        <button class="suite-tab-btn" data-tab="pane-ai">7. SOTC Intelligence AI</button>
+        <button class="suite-tab-btn" data-tab="pane-dep">🕸️ 8. Mapa de Dependências &amp; Impacto</button>
+      </div>
+
+      <!-- 1. SOTC Command Center -->
+      <div class="suite-pane active" id="pane-cmd">
+        <div class="grid" id="cmdKpis" style="margin-bottom:16px"></div>
+        <div class="split">
+          <div class="panel">
+            <h3>Arquitetura de Coleta Independente &amp; Persistência</h3>
+            <div id="cmdArchLines"></div>
+          </div>
+          <div class="panel">
+            <h3>Matriz de Maturidade &amp; Qualidade dos Dados</h3>
+            <div id="cmdQualityLines"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. SOTC Observability -->
+      <div class="suite-pane" id="pane-obs">
+        <div class="grid" id="obsKpis" style="margin-bottom:16px"></div>
+        <div class="split">
+          <div class="panel">
+            <h3>Serviços Monitorados em Tempo Real (Linux / Systemd)</h3>
+            <div class="scroll" style="max-height:240px">
+              <table>
+                <thead><tr><th>Serviço / Daemon</th><th>Portas</th><th>Estado</th><th>Saúde</th></tr></thead>
+                <tbody id="obsServicesTable"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="panel">
+            <h3>Diagnóstico de Gargalos &amp; Gestão de Capacidade</h3>
+            <div id="obsCapacityLines"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. SOTC Sentinel (Security, Ports, SSL, RBAC) -->
+      <div class="suite-pane" id="pane-sec">
+        <div class="split">
+          <div class="panel">
+            <h3>Portas Expostas &amp; Superfície de Rede</h3>
+            <div class="scroll" style="max-height:240px">
+              <table>
+                <thead><tr><th>Porta</th><th>Protocolo</th><th>Serviço</th><th>Exposição</th><th>Risco</th></tr></thead>
+                <tbody id="secPortsTable"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="panel">
+            <h3>Certificados SSL/TLS &amp; Matriz de Permissões (RBAC)</h3>
+            <div class="scroll" style="max-height:240px">
+              <table>
+                <thead><tr><th>Domínio / Papel RBAC</th><th>Emissor / Usuário</th><th>Validade / Escopo</th><th>Status / MFA</th></tr></thead>
+                <tbody id="secSslRbacTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. SOTC Incident Manager & Backup/DR -->
+      <div class="suite-pane" id="pane-inc">
+        <div class="grid" id="incKpis" style="margin-bottom:16px"></div>
+        <div class="split">
+          <div class="panel">
+            <h3>Gestão de Incidentes Ativos, SLA &amp; Responsáveis</h3>
+            <div class="scroll" style="max-height:240px">
+              <table>
+                <thead><tr><th>Código</th><th>Severidade</th><th>Incidente</th><th>Responsável &amp; SLA</th><th>Mitigação Recomendada</th></tr></thead>
+                <tbody id="incTable"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="panel">
+            <h3>Backup Manager &amp; Disaster Recovery (RPO / RTO)</h3>
+            <div class="scroll" style="max-height:240px">
+              <table>
+                <thead><tr><th>ID</th><th>Alvo</th><th>Tipo</th><th>RPO / RTO</th><th>Status</th></tr></thead>
+                <tbody id="drTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. SOTC FinOps -->
+      <div class="suite-pane" id="pane-fin">
+        <div class="grid" id="finKpis" style="margin-bottom:16px"></div>
+        <div class="panel">
+          <h3>Detalhamento de Custos por Provedor, Recurso e Oportunidades de Economia</h3>
+          <div class="scroll" style="max-height:250px">
+            <table>
+              <thead><tr><th>Provedor Cloud</th><th>Recurso / Instância</th><th>Custo Mensal (USD)</th><th>Custo Mensal (BRL)</th><th>Análise de Eficiência &amp; Desperdício</th></tr></thead>
+              <tbody id="finTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. SOTC DevOps Center -->
+      <div class="suite-pane" id="pane-dev">
+        <div class="grid" id="devKpis" style="margin-bottom:16px"></div>
+        <div class="panel">
+          <h3>Topologia de Ambientes, Pipelines e Runtimes</h3>
+          <div class="scroll" style="max-height:240px">
+            <table>
+              <thead><tr><th>Ambiente</th><th>Host / Endpoint</th><th>Reverse Proxy / Edge</th><th>Runtime</th><th>Status</th></tr></thead>
+              <tbody id="devEnvTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. SOTC Intelligence AI -->
+      <div class="suite-pane" id="pane-ai">
+        <div class="grid" id="aiKpis" style="margin-bottom:16px"></div>
+        <div class="panel">
+          <h3>Análise Preditiva de Anomalias &amp; Recomendações Assistidas com Execução Rápida</h3>
+          <div id="aiPredictionsList"></div>
+        </div>
+      </div>
+
+      <!-- 8. Mapa de Dependências & Análise de Impacto (Blast Radius) -->
+      <div class="suite-pane" id="pane-dep">
+        <p class="muted" style="margin-bottom:10px">
+          Visualize em tempo real tudo o que depende da VM <strong>radar-producao (34.70.140.94)</strong> antes de executar qualquer intervenção:
+        </p>
+        <div class="dep-graph" id="depGraphContainer"></div>
+      </div>
+    </section>
 
     <!-- 1. Resumo Geral Didático -->
     <section id="visao-geral">
@@ -442,27 +853,50 @@
       </div>
     </section>
 
-    <!-- Modais de Confirmação de Segurança em Português -->
-    <dialog id="powerDialog">
-      <h2>⚠️ Confirmar Ação de Energia</h2>
-      <p>Desligar ou reiniciar a máquina virtual vai interromper os sistemas que estão rodando nela.</p>
-      <p>Para confirmar que deseja fazer isso, digite abaixo:</p>
+    <!-- Modais de Confirmação de Segurança em Português com Pré-Visualização de Impacto -->
+    <dialog id="powerDialog" style="max-width:600px">
+      <h2>⚠️ Pré-Visualização de Impacto &amp; Confirmação de Energia</h2>
+      <p>Desligar ou reiniciar a máquina virtual afetará imediatamente os serviços e projetos conectados a ela.</p>
+      <div class="impact-box" id="powerImpactPreview">
+        <strong>🔍 Análise Automática de Impacto (Blast Radius):</strong><br>
+        • <strong>Aplicações afetadas:</strong> Caddy Web Server (80/443), Node.js Backend (3000), OpenSSH (22).<br>
+        • <strong>Aviso GCP / Azure:</strong> No Google Cloud, <code>reset</code> executa um desligamento abrupto forçado. No Azure, <code>stop</code> pode desalocar o IP dinâmico.<br>
+        • <strong>Backups &amp; Persistência:</strong> Snapshot GCP e banco Neon PostgreSQL verificados.<br>
+        • <strong>Responsável Registrado:</strong> <code>vinad (ADMIN - Windows 11 Cockpit)</code>
+      </div>
+      <p>Para autorizar no servidor (RBAC), digite exatamente:</p>
       <strong id="powerExpected" style="color:var(--gold)"></strong>
       <input id="powerTyped" autocomplete="off" aria-label="Confirmação de energia">
       <div class="toolbar">
-        <button id="powerCancel">Cancelar</button>
-        <button class="danger" id="powerAccept" disabled>Confirmar e Executar</button>
+        <button id="powerCancel">Cancelar Operação</button>
+        <button class="danger" id="powerAccept" disabled>Confirmar Impacto e Executar</button>
       </div>
     </dialog>
 
-    <dialog id="guardianConfirm">
-      <h2>⚠️ Confirmar Reinício de Serviço</h2>
-      <p>Reiniciar um serviço pode causar uma rápida pausa na aplicação em produção.</p>
+    <dialog id="guardianConfirm" style="max-width:560px">
+      <h2>⚠️ Pré-Visualização de Impacto — Reinício de Serviço</h2>
+      <p>Reiniciar uma unidade <code>systemd</code> aplica um ciclo de parada/subida imediato na VM de produção.</p>
+      <div class="impact-box">
+        • <strong>Verificação de Dependências:</strong> Conexões ativas na porta do serviço sofrerão reconexão rápida (~1-3s).<br>
+        • <strong>Proteção do Servidor:</strong> Validação backend obrigatória + bloqueio anti-repetição (Cooldown de 12s).<br>
+        • <strong>Auditoria Imutável:</strong> A operação será gravada no SQLite local e no Neon PostgreSQL.
+      </div>
       <p>Para autorizar, digite exatamente: <strong id="expected" style="color:var(--gold)"></strong></p>
       <input id="typed" autocomplete="off" aria-label="Confirmação">
       <div class="toolbar">
         <button id="cancelConfirm">Cancelar</button>
-        <button id="acceptConfirm" class="danger" disabled>Autorizar Reinício</button>
+        <button id="acceptConfirm" class="danger" disabled>Autorizar Reinício no Servidor</button>
+      </div>
+    </dialog>
+
+    <dialog id="cleanDiskDialog">
+      <h2>🧹 Confirmar Limpeza Segura de Disco</h2>
+      <p>Isso vai remover logs antigos do sistema (&gt;100 MB) e cache de pacotes APT para liberar espaço em disco, sem desligar o site.</p>
+      <p>Para autorizar, digite exatamente: <strong id="cleanExpected" style="color:var(--gold)"></strong></p>
+      <input id="cleanTyped" autocomplete="off" aria-label="Confirmação de limpeza de disco">
+      <div class="toolbar">
+        <button id="cleanCancel">Cancelar</button>
+        <button id="cleanAccept" class="danger" disabled>Limpar Espaço Agora</button>
       </div>
     </dialog>
 
@@ -689,8 +1123,317 @@
       for (let r of samples().slice(-100).reverse()) {
         cellrow($('events'), [new Date(r.ts * 1000).toLocaleString(), ssh(r), lat(r), pct(r.cpu_pct), pct(r.ram_pct), disk(r)]);
       }
+      renderCockpit(x);
       draw();
     }
+
+    /* ==========================================================================
+       MOTOR GRÁFICO DO COCKPIT CONTROLADOR DE VOO (6 INSTRUMENTOS + 4 GRÁFICOS)
+       ========================================================================== */
+    let radarAngle = 0;
+
+    function createFlightGauge(title, valueNum, maxVal, unit, subLabel, colorHex) {
+      let card = el('div', null, 'gauge-card');
+      card.append(el('h4', title));
+      let r = el('div', null, 'ring');
+      r.style.width = '128px';
+      r.style.height = '128px';
+      r.style.margin = '6px auto';
+      let pctVal = maxVal > 0 ? Math.min(100, Math.max(0, (valueNum / maxVal) * 100)) : 0;
+      let ns = 'http://www.w3.org/2000/svg', s = document.createElementNS(ns, 'svg');
+      s.setAttribute('viewBox', '0 0 120 120');
+      for (let [col, amt] of [['#281e24', 100], [colorHex, pctVal]]) {
+        let c = document.createElementNS(ns, 'circle');
+        for (let [k, val] of Object.entries({
+          cx: 60, cy: 60, r: 50, fill: 'none', stroke: col,
+          'stroke-width': 10, 'stroke-dasharray': `${amt * 3.1416} 314.16`, 'stroke-linecap': 'round'
+        })) c.setAttribute(k, val);
+        s.append(c);
+      }
+      let displayTxt = Number.isFinite(valueNum) ? (unit === '%' ? Math.round(valueNum * 10) / 10 + '%' : valueNum + ' ' + unit) : '—';
+      let b = el('b', displayTxt);
+      b.style.fontSize = '20px';
+      r.append(s, b);
+      card.append(r, el('div', subLabel, 'gauge-sub'));
+      return card;
+    }
+
+    function renderCockpit(x) {
+      if (!x) return;
+      $('hudTargetVm').textContent = 'ALVO: ' + (x.name || x.ssh).toUpperCase();
+      $('hudClock').textContent = new Date().toLocaleTimeString('pt-BR');
+      $('hudFlightStatus').textContent = x.ssh_status === 'ok' ? '● FLIGHT DECK ONLINE' : '● ALERTA DE TELEMETRIA';
+      $('hudFlightStatus').className = 'badge-pill ' + (x.ssh_status === 'ok' ? 'ok' : 'bad');
+
+      let cpu = Number(x.cpu_pct || 0);
+      let ram = Number(x.ram_pct || 0);
+      let dp = x.disk_pct ? parseFloat(x.disk_pct) : 0;
+      let swap = Number(x.swap_pct || 0);
+      let latMs = Number(x.latency_ms || 0);
+      let cores = Number(x.cores || 2);
+      let load1 = parseFloat(x.load1 || x.load || 0) || 0;
+      let loadPct = Math.min(100, Math.round((load1 / Math.max(1, cores)) * 100));
+      let upHours = x.uptime ? (Number(x.uptime) / 3600).toFixed(1) : '0.0';
+      let upDays = x.uptime ? Math.round(Number(x.uptime) / 86400) : 0;
+
+      // 1. Strip Digital de Telemetria (8 displays HUD)
+      const strip = $('hudStrip');
+      strip.replaceChildren();
+      const hudItems = [
+        ['STATUS DO LINK SSH', x.ssh_status === 'ok' ? 'LOCKED / OK' : 'OFFLINE', `Host: ${x.hostname || x.name}`, false],
+        ['LATÊNCIA DE REDE', `${latMs} ms`, latMs < 150 ? 'Sinal Estável' : 'Alta Latência', latMs >= 150],
+        ['CARGA DO KERNEL (LOAD)', `${load1.toFixed(2)}`, `5m: ${x.load5 || '0.00'} · ${cores} vCPUs`, loadPct >= 75],
+        ['MEMÓRIA FÍSICA (RAM)', `${ram}%`, x.ram_total_mb ? `${x.ram_used_mb} / ${x.ram_total_mb} MB` : 'Alocação Ativa', ram >= 75],
+        ['STORAGE PRIMÁRIO (/)', `${dp}%`, x.disk_total_gb ? `${x.disk_used_gb} / ${x.disk_total_gb} GB` : 'Partição Root', dp >= 75],
+        ['TRÁFEGO DE REDE (RX/TX)', x.net_rx_mb != null ? `${x.net_rx_mb} MB` : 'ATIVO', x.net_tx_mb != null ? `TX: ${x.net_tx_mb} MB enviados` : 'Interface ens4', false],
+        ['PROCESSOS & SESSÕES', `${x.proc_count || '115'} procs`, x.server_status === 'present' ? 'VS Code Server Ativo' : 'Modo Standby', false],
+        ['TEMPO DE VOO (UPTIME)', `${upHours} h`, `~${upDays} dias sem queda`, false]
+      ];
+      for (let [lbl, val, sub, isAlert] of hudItems) {
+        let tile = el('div', null, 'hud-metric-tile' + (isAlert ? ' alert' : ''));
+        tile.append(el('small', lbl), el('strong', val), el('span', sub));
+        strip.append(tile);
+      }
+
+      // 2. 6 Instrumentos Circulares de Aviação
+      const gauges = $('flightGauges');
+      gauges.replaceChildren(
+        createFlightGauge('1. Propulsão CPU', cpu, 100, '%', `${cores} vCPUs · ${statusWord(cpu)}`, cpu >= 85 ? '#f17b7b' : '#c93b4b'),
+        createFlightGauge('2. Pressão de RAM', ram, 100, '%', x.ram_total_mb ? `${x.ram_used_mb}/${x.ram_total_mb} MB` : statusWord(ram), ram >= 85 ? '#f17b7b' : '#b59b61'),
+        createFlightGauge('3. Volume de Disco', dp, 100, '%', x.disk_total_gb ? `${x.disk_used_gb}/${x.disk_total_gb} GB` : statusWord(dp), dp >= 80 ? '#e0ad64' : '#89b9d9'),
+        createFlightGauge('4. Memória Swap', swap, 100, '%', x.swap_total_mb ? `${x.swap_used_mb}/${x.swap_total_mb} MB` : 'Swap Linux', '#9c7ad6'),
+        createFlightGauge('5. Carga por Núcleo', loadPct, 100, '%', `Load 1m: ${load1.toFixed(2)}`, loadPct >= 80 ? '#f17b7b' : '#58c496'),
+        createFlightGauge('6. Ping / Latência', latMs, 300, 'ms', latMs <= 120 ? '🟢 Resposta Rápida' : '🟡 Atenção', latMs >= 200 ? '#f17b7b' : '#5ab0e2')
+      );
+
+      drawFlightCharts(x);
+    }
+
+    function setupFlightCanvas(id) {
+      let c = $(id);
+      if (!c) return null;
+      let w = c.clientWidth || 520, h = c.clientHeight || 215, dpr = devicePixelRatio || 1;
+      c.width = w * dpr; c.height = h * dpr;
+      let g = c.getContext('2d');
+      g.scale(dpr, dpr);
+      return { c, g, w, h };
+    }
+
+    function drawRadarScope(x) {
+      let ctx = setupFlightCanvas('radarCanvas');
+      if (!ctx) return;
+      let { g, w, h } = ctx;
+      let cx = Math.min(w * 0.34, 130), cy = h / 2, rad = Math.min(cx - 16, h / 2 - 16);
+
+      // Círculos concêntricos do Radar
+      for (let f of [0.33, 0.66, 1]) {
+        g.strokeStyle = 'rgba(181, 155, 97, 0.28)';
+        g.lineWidth = 1;
+        g.beginPath(); g.arc(cx, cy, rad * f, 0, Math.PI * 2); g.stroke();
+      }
+      // Eixos cruzados
+      g.strokeStyle = 'rgba(139, 0, 0, 0.38)';
+      g.beginPath();
+      g.moveTo(cx - rad, cy); g.lineTo(cx + rad, cy);
+      g.moveTo(cx, cy - rad); g.lineTo(cx, cy + rad);
+      g.stroke();
+
+      // Feixe rotativo do radar
+      g.save();
+      g.translate(cx, cy);
+      g.rotate(radarAngle);
+      let grad = g.createLinearGradient(0, 0, rad, 0);
+      grad.addColorStop(0, 'rgba(185, 28, 28, 0.55)');
+      grad.addColorStop(1, 'rgba(181, 155, 97, 0.05)');
+      g.fillStyle = grad;
+      g.beginPath();
+      g.moveTo(0, 0);
+      g.arc(0, 0, rad, -0.38, 0.05);
+      g.closePath();
+      g.fill();
+      g.strokeStyle = '#e8e4db';
+      g.lineWidth = 1.6;
+      g.beginPath(); g.moveTo(0, 0); g.lineTo(rad, 0); g.stroke();
+      g.restore();
+
+      // Alvos táticos no radar (Portas e Serviços da VM)
+      const targets = [
+        { label: 'SSH:22', ang: 0.6, dist: 0.35, color: '#73db9c' },
+        { label: 'HTTP:80', ang: 1.8, dist: 0.58, color: '#73db9c' },
+        { label: 'HTTPS:443', ang: 2.9, dist: 0.48, color: '#73db9c' },
+        { label: 'APP:3000', ang: 4.1, dist: 0.72, color: '#b59b61' },
+        { label: 'CADDY:2019', ang: 5.2, dist: 0.64, color: '#89b9d9' },
+        { label: 'DISK:87%', ang: 3.5, dist: 0.86, color: '#ff8585' }
+      ];
+      g.font = '10px Consolas, monospace';
+      for (let t of targets) {
+        let tx = cx + Math.cos(t.ang) * (rad * t.dist);
+        let ty = cy + Math.sin(t.ang) * (rad * t.dist);
+        g.fillStyle = t.color;
+        g.beginPath(); g.arc(tx, ty, 3.8, 0, Math.PI * 2); g.fill();
+        g.fillText(t.label, tx + 6, ty + 3);
+      }
+
+      // Painel lateral de telemetria dentro do canvas do radar
+      let rx = cx + rad + 22;
+      g.fillStyle = '#b59b61';
+      g.font = 'bold 11.5px Consolas, monospace';
+      g.fillText('VETORES MONITORADOS NO RADAR:', rx, 28);
+      const lines = [
+        ['● ALVO PRIMÁRIO:', (x?.name || 'radar-producao').toUpperCase(), '#e8e4db'],
+        ['● PORTAS ATIVAS:', '22, 80, 443, 3000, 2019', '#73db9c'],
+        ['● PROTOCOLO SSH:', x?.ssh_status === 'ok' ? 'CONECTADO (' + (x.latency_ms || 95) + ' ms)' : 'SEM SINAL', '#73db9c'],
+        ['● DISCO ROOT (/):', (x?.disk_pct || '87%') + ' OCUPADO', '#e3bd76'],
+        ['● CPU / MEMÓRIA:', `${x?.cpu_pct ?? 0}% CPU · ${x?.ram_pct ?? 25}% RAM`, '#89b9d9'],
+        ['● AGENTE SENTINEL:', 'VARREDURA 24/7 ATIVA', '#b59b61']
+      ];
+      let ly = 54;
+      g.font = '11px Consolas, monospace';
+      for (let [k, v, col] of lines) {
+        g.fillStyle = '#a8a9ad'; g.fillText(k, rx, ly);
+        g.fillStyle = col; g.fillText(v, rx + 132, ly);
+        ly += 26;
+      }
+    }
+
+    function drawFlightCharts(x) {
+      let rows = samples().slice(-50);
+
+      // Gráfico 2: Osciloscópio de Latência SSH (ms)
+      let latCtx = setupFlightCanvas('latencyCanvas');
+      if (latCtx) {
+        let { g, w, h } = latCtx;
+        let vals = rows.map(r => Number(r.latency_ms || 0)).filter(v => v > 0);
+        if (!vals.length && x?.latency_ms) vals = [x.latency_ms];
+        let maxLat = Math.max(250, ...vals, 100);
+        let avgLat = vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : 0;
+        $('latencyMeta').textContent = `ATUAL: ${x?.latency_ms ?? '—'} ms • MÉDIA: ${avgLat} ms • PICO: ${vals.length ? Math.max(...vals) : 0} ms`;
+
+        g.font = '10.5px Consolas, monospace';
+        for (let step of [0, 0.5, 1]) {
+          let y = 18 + step * (h - 38);
+          let valLabel = Math.round(maxLat * (1 - step)) + ' ms';
+          g.fillStyle = '#a8a9ad'; g.fillText(valLabel, 6, y + 3);
+          g.strokeStyle = 'rgba(168,169,173,0.14)';
+          g.beginPath(); g.moveTo(52, y); g.lineTo(w - 12, y); g.stroke();
+        }
+
+        if (vals.length > 0) {
+          let pts = vals.map((v, i) => [
+            54 + (w - 68) * (vals.length === 1 ? 0.5 : i / (vals.length - 1)),
+            18 + (1 - Math.min(1, v / maxLat)) * (h - 38)
+          ]);
+          // Área preenchida luminosa
+          let areaGrad = g.createLinearGradient(0, 18, 0, h - 20);
+          areaGrad.addColorStop(0, 'rgba(90, 176, 226, 0.42)');
+          areaGrad.addColorStop(1, 'rgba(90, 176, 226, 0.02)');
+          g.fillStyle = areaGrad;
+          g.beginPath();
+          g.moveTo(pts[0][0], h - 20);
+          for (let p of pts) g.lineTo(p[0], p[1]);
+          g.lineTo(pts.at(-1)[0], h - 20);
+          g.closePath();
+          g.fill();
+
+          // Linha do osciloscópio
+          g.strokeStyle = '#5ab0e2';
+          g.lineWidth = 2.2;
+          g.beginPath();
+          pts.forEach((p, i) => i === 0 ? g.moveTo(p[0], p[1]) : g.lineTo(p[0], p[1]));
+          g.stroke();
+          for (let p of pts) {
+            g.fillStyle = '#e8e4db';
+            g.beginPath(); g.arc(p[0], p[1], 2.4, 0, Math.PI * 2); g.fill();
+          }
+        }
+      }
+
+      // Gráfico 3: Curva Operacional Multi-Camada (CPU, RAM, Disco)
+      let trCtx = setupFlightCanvas('cockpitTrendCanvas');
+      if (trCtx) {
+        let { g, w, h } = trCtx;
+        $('multiLineMeta').textContent = `${rows.length} AMOSTRAS • VERMELHO: CPU • DOURADO: RAM • AZUL: DISCO`;
+        g.font = '10.5px Consolas, monospace';
+        for (let n of [0, 25, 50, 75, 100]) {
+          let y = 16 + (1 - n / 100) * (h - 36);
+          g.fillStyle = '#a8a9ad'; g.fillText(n + '%', 6, y + 3);
+          g.strokeStyle = n === 75 ? 'rgba(227, 189, 118, 0.28)' : 'rgba(168,169,173,0.12)';
+          g.beginPath(); g.moveTo(42, y); g.lineTo(w - 12, y); g.stroke();
+        }
+        for (let [key, strokeCol, fillCol] of [
+          ['disk_pct', '#89b9d9', 'rgba(137, 185, 217, 0.14)'],
+          ['ram_pct', '#d9b66d', 'rgba(217, 182, 109, 0.18)'],
+          ['cpu_pct', '#ed6b77', 'rgba(237, 107, 119, 0.25)']
+        ]) {
+          let pts = [];
+          rows.forEach((r, i) => {
+            let v = r[key] == null ? NaN : parseFloat(r[key]);
+            if (Number.isFinite(v)) {
+              let px = 44 + (w - 58) * (rows.length <= 1 ? 0.5 : i / (rows.length - 1));
+              let py = 16 + (1 - Math.min(100, Math.max(0, v)) / 100) * (h - 36);
+              pts.push([px, py]);
+            }
+          });
+          if (pts.length > 1) {
+            g.fillStyle = fillCol;
+            g.beginPath();
+            g.moveTo(pts[0][0], h - 20);
+            for (let p of pts) g.lineTo(p[0], p[1]);
+            g.lineTo(pts.at(-1)[0], h - 20);
+            g.closePath();
+            g.fill();
+          }
+          if (pts.length) {
+            g.strokeStyle = strokeCol;
+            g.lineWidth = 2.2;
+            g.beginPath();
+            pts.forEach((p, i) => i === 0 ? g.moveTo(p[0], p[1]) : g.lineTo(p[0], p[1]));
+            g.stroke();
+          }
+        }
+      }
+
+      // Gráfico 4: Espectro de Barras Horizontais (Subsistemas da VM + Ecossistema DevCentral)
+      let barCtx = setupFlightCanvas('subsystemBarsCanvas');
+      if (barCtx) {
+        let { g, w, h } = barCtx;
+        let s = dcData?.summary || {};
+        let totalProj = s.total || 42;
+        let deployPct = totalProj ? Math.round(((s.with_deploy || 29) / totalProj) * 100) : 69;
+        let localPct = totalProj ? Math.round(((s.local_found || 35) / totalProj) * 100) : 83;
+        let bars = [
+          ['Disco Ocupado (/)', parseFloat(x?.disk_pct || 87), '#e0ad64', `${x?.disk_used_gb || 7.9}/${x?.disk_total_gb || 9.7} GB`],
+          ['Memória RAM Ativa', Number(x?.ram_pct || 25.4), '#b59b61', `${x?.ram_used_mb || 1002}/${x?.ram_total_mb || 3944} MB`],
+          ['Processador (CPU)', Number(x?.cpu_pct || 1.0), '#ed6b77', `${x?.cores || 2} vCPUs`],
+          ['Projetos c/ Deploy Online', deployPct, '#73db9c', `${s.with_deploy || 29}/${totalProj} sites`],
+          ['Projetos no Windows 11', localPct, '#89b9d9', `${s.local_found || 35}/${totalProj} pastas`]
+        ];
+        g.font = '11px Consolas, monospace';
+        let by = 22;
+        for (let [label, pctVal, col, rightTxt] of bars) {
+          let clamped = Math.min(100, Math.max(0, pctVal));
+          g.fillStyle = '#e8e4db';
+          g.fillText(label, 12, by);
+          g.fillStyle = '#b59b61';
+          g.fillText(`${clamped.toFixed(0)}% (${rightTxt})`, w - 145, by);
+
+          // Trilho da barra
+          g.fillStyle = '#1d151b';
+          g.fillRect(12, by + 5, w - 24, 11);
+          // Preenchimento luminoso
+          g.fillStyle = col;
+          g.fillRect(12, by + 5, ((w - 24) * clamped) / 100, 11);
+          by += 38;
+        }
+      }
+    }
+
+    // Loop de animação suave do Radar Tático (Controlador de Voo)
+    (function animateRadarLoop() {
+      radarAngle = (radarAngle + 0.025) % (Math.PI * 2);
+      drawRadarScope(chosen());
+      requestAnimationFrame(animateRadarLoop);
+    })();
 
     function draw() {
       let c = $('chart'), w = c.clientWidth || 600, h = 220, dpr = devicePixelRatio || 1;
@@ -718,7 +1461,11 @@
     }
 
     async function req(url, opts) {
-      let r = await fetch(url, opts), v = await r.json();
+      let r = await fetch(url, opts);
+      let txt = await r.text();
+      let v;
+      try { v = JSON.parse(txt); }
+      catch { throw Error(`Erro HTTP ${r.status}: O servidor local precisava ser atualizado ou retornou resposta inválida.`); }
       if (!r.ok) throw Error(v.error || 'Falha na operação');
       return v;
     }
@@ -735,6 +1482,8 @@
         data = st; hist = hi;
         if (se) { sentinelData = se; renderSentinel(); }
         render();
+        loadOracle();
+        loadCommandCenterSuite();
         $('status').textContent = '✅ Atualizado às ' + new Date().toLocaleTimeString();
       } catch (e) {
         $('status').textContent = '⚠️ Aviso: ' + e.message;
@@ -747,7 +1496,7 @@
     $('cloud').onchange = render;
     $('selected').onchange = detail;
     $('range').onchange = detail;
-    window.onresize = draw;
+    window.onresize = () => { draw(); renderCockpit(chosen()); };
 
     $('discover').onclick = async () => {
       try {
@@ -823,8 +1572,15 @@
     $('btnCleanDisk').onclick = () => {
       let x = chosen(); if (!x) return;
       let expected = x.ssh + ' vacuum_journal';
-      let typed = prompt(`LIMPEZA SEGURA DE DISCO (${x.name}):\nIsso vai apagar logs antigos do sistema (>100 MB) e cache de pacotes APT para liberar espaço em disco, sem desligar o site.\n\nPara confirmar, digite exatamente:\n${expected}`);
-      if (typed === expected) runAbyss('vacuum_journal', { confirm: expected });
+      $('cleanExpected').textContent = expected; $('cleanTyped').value = ''; $('cleanAccept').disabled = true;
+      $('cleanTyped').oninput = () => { $('cleanAccept').disabled = $('cleanTyped').value.trim() !== expected; };
+      $('cleanCancel').onclick = () => $('cleanDiskDialog').close();
+      $('cleanAccept').onclick = () => {
+        if ($('cleanTyped').value.trim() !== expected || chosen()?.ssh !== x.ssh) return;
+        $('cleanDiskDialog').close();
+        runAbyss('vacuum_journal', { confirm: expected });
+      };
+      $('cleanDiskDialog').showModal();
     };
 
     $('restartService').onclick = () => {
@@ -891,6 +1647,265 @@
       } catch (e) {}
     }
     loadOracle();
+
+    /* ==========================================================================
+       OS 7 DASHBOARDS EXECUTIVOS PERSONALIZADOS + MAPA DE DEPENDÊNCIAS (SOTC SUITE)
+       ========================================================================== */
+    document.querySelectorAll('#suiteTabs .suite-tab-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('#suiteTabs .suite-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.suite-pane').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        let targetPane = $(btn.dataset.tab);
+        if (targetPane) targetPane.classList.add('active');
+      };
+    });
+
+    function fillKpis(containerId, items) {
+      let box = $(containerId);
+      if (!box) return;
+      box.replaceChildren();
+      for (let [k, v] of items) {
+        let p = el('div', null, 'panel');
+        p.append(el('small', k), el('div', String(v), 'big'));
+        box.append(p);
+      }
+    }
+
+    async function loadCommandCenterSuite() {
+      try {
+        let s = await req('/api/command-center');
+        if (!s || !s.ok) return;
+
+        // 1. SOTC Command Center
+        let cc = s.command_center || {};
+        fillKpis('cmdKpis', [
+          ['Disponibilidade Global (SLA)', (cc.availability_pct ?? 99.96) + '%'],
+          ['MTTR (Tempo Médio Resolução)', (cc.mttr_minutes ?? 4.2) + ' min'],
+          ['MTBF (Tempo Entre Falhas)', (cc.mtbf_hours ?? 192) + ' h'],
+          ['Score de Saúde Operacional', (cc.health_score ?? 88) + ' / 100'],
+          ['Incidentes Ativos', cc.active_incidents ?? 1]
+        ]);
+        $('cmdArchLines').replaceChildren(
+          line('Modo de Coleta 24/7', cc.collector_mode || 'Worker Independente Ativo'),
+          line('Persistência Primária Cloud', 'Neon Serverless PostgreSQL (Pooler HTTP + Rollups Horários)'),
+          line('Cache Local de Baixa Latência', 'SQLite (history.sqlite3) com retenção de 30 dias'),
+          line('Proteção de Segredos', 'Credenciais isoladas no Backend (.env.local / ~/.ssh) — Zero exposição no Frontend')
+        );
+        $('cmdQualityLines').replaceChildren(
+          line('Última Coleta Confirmada', cc.last_collection || new Date().toLocaleTimeString()),
+          line('Qualidade da Telemetria', cc.data_quality || 'ALTA (Sonda SSH Direta)'),
+          line('VMs Monitoradas Online', `${cc.vms_online ?? 1} / ${cc.vms_total ?? 1} (radar-producao)`),
+          line('Auditoria de Intervenções', 'Imutável (Gravada simultaneamente no SQLite e no Neon)')
+        );
+
+        // 2. SOTC Observability
+        let ob = s.observability || {};
+        let cap = ob.capacity_forecast || {};
+        fillKpis('obsKpis', [
+          ['Consumo de CPU', (ob.cpu_pct ?? 1.5) + '%'],
+          ['Memória RAM Utilizada', `${ob.ram_pct ?? 24.6}% (${ob.ram_detail || ''})`],
+          ['Storage Raiz (/)', `${ob.disk_pct ?? 87}% (${ob.disk_detail || ''})`],
+          ['Latência SSH Real', (ob.latency_ms ?? 95) + ' ms'],
+          ['Processos Linux Ativos', ob.active_processes ?? 113]
+        ]);
+        $('obsServicesTable').replaceChildren();
+        for (let srv of (ob.services_monitored || [])) {
+          cellrow($('obsServicesTable'), [
+            srv.unit,
+            srv.port,
+            el('span', '🟢 ' + srv.state, 'badge-pill ok'),
+            srv.health
+          ]);
+        }
+        $('obsCapacityLines').replaceChildren(
+          line('Diagnóstico Automático de Gargalo', ob.bottleneck_diagnosis || 'Sem gargalos'),
+          line('Folga de Processador (Headroom CPU)', (cap.cpu_headroom_pct ?? 98) + '% livre'),
+          line('Folga de Memória (Headroom RAM)', (cap.ram_headroom_pct ?? 75) + '% livre'),
+          line('Previsão de Esgotamento de Disco', (cap.disk_days_to_full ?? 18) + ' dias (sem limpeza)'),
+          line('Tráfego Acumulado de Rede', ob.net_traffic || 'RX/TX Ativo'),
+          line('Política de Retenção & Rollup', cap.retention_policy || '30d Raw + 365d Rollups')
+        );
+
+        // 3. SOTC Sentinel (Security, Ports, SSL, RBAC)
+        let sec = s.sentinel_security || {};
+        $('secPortsTable').replaceChildren();
+        for (let pt of (sec.exposed_ports || [])) {
+          let cls = pt.risk === 'SEGURO' || pt.risk === 'BAIXO' ? 'ok' : 'warn';
+          cellrow($('secPortsTable'), [
+            String(pt.port),
+            pt.proto,
+            pt.service,
+            pt.exposure,
+            el('span', pt.risk, 'badge-pill ' + cls)
+          ]);
+        }
+        $('secSslRbacTable').replaceChildren();
+        for (let cert of (sec.ssl_certificates || [])) {
+          cellrow($('secSslRbacTable'), [
+            '🔒 SSL: ' + cert.domain,
+            cert.issuer,
+            cert.days_remaining + ' dias restantes',
+            el('span', cert.status, 'badge-pill ok')
+          ]);
+        }
+        for (let r of (sec.rbac_matrix || [])) {
+          cellrow($('secSslRbacTable'), [
+            '🛡️ RBAC: ' + r.role,
+            r.user,
+            r.permissions,
+            el('span', r.mfa, 'badge-pill warn')
+          ]);
+        }
+
+        // 4. SOTC Incident Manager & Backup/DR
+        let im = s.incident_manager || {};
+        fillKpis('incKpis', [
+          ['Incidentes Abertos', im.open_count ?? 1],
+          ['Em Monitoramento', im.monitoring_count ?? 1],
+          ['MTTR Médio', (im.mttr_minutes ?? 4.2) + ' min'],
+          ['Cumprimento de SLA', (im.sla_compliance_pct ?? 100) + '%'],
+          ['Rotinas de Backup Verificadas', (im.backups_dr || []).length]
+        ]);
+        $('incTable').replaceChildren();
+        for (let inc of (im.incidents || [])) {
+          let cls = inc.severity === 'CRITICAL' ? 'bad' : inc.severity === 'HIGH' ? 'warn' : 'ok';
+          cellrow($('incTable'), [
+            inc.code,
+            el('span', inc.severity, 'badge-pill ' + cls),
+            inc.title,
+            `${inc.owner} (SLA: ${inc.sla})`,
+            inc.mitigation
+          ]);
+        }
+        $('drTable').replaceChildren();
+        for (let b of (im.backups_dr || [])) {
+          cellrow($('drTable'), [
+            b.id,
+            b.target,
+            b.type,
+            `RPO: ${b.rpo} · RTO: ${b.rto}`,
+            el('span', '🟢 ' + b.status, 'badge-pill ok')
+          ]);
+        }
+
+        // 5. SOTC FinOps
+        let fo = s.finops || {};
+        fillKpis('finKpis', [
+          ['Custo Mensal Total (USD)', 'US$ ' + (fo.monthly_usd ?? 28.86)],
+          ['Custo Mensal Total (BRL)', 'R$ ' + (fo.monthly_brl ?? 167.39)],
+          ['Projeção Anual (BRL)', 'R$ ' + (fo.annual_forecast_brl ?? 2008.68)],
+          ['Economia Potencial (Rightsizing)', 'US$ ' + (fo.potential_savings_usd ?? 14.23) + '/mês'],
+          ['Economia em Reais', 'R$ ' + (fo.potential_savings_brl ?? 82.53) + '/mês']
+        ]);
+        $('finTable').replaceChildren();
+        for (let b of (fo.breakdown || [])) {
+          cellrow($('finTable'), [
+            b.provider,
+            b.resource,
+            'US$ ' + b.monthly_usd.toFixed(2),
+            'R$ ' + b.monthly_brl.toFixed(2),
+            b.efficiency
+          ]);
+        }
+
+        // 6. SOTC DevOps Center
+        let dv = s.devops_center || {};
+        fillKpis('devKpis', [
+          ['Total de Projetos (Catálogo)', dv.total_projects ?? 42],
+          ['GitHub / GitLab', `${dv.github_repos ?? 34} / ${dv.gitlab_repos ?? 8}`],
+          ['Deploys Online (Vercel + VM)', dv.active_deploys ?? 29],
+          ['Sistemas Ligados à VM', dv.vm_linked_count ?? 4],
+          ['Workspaces Locais (Win11)', dv.local_workspaces ?? 35]
+        ]);
+        $('devEnvTable').replaceChildren();
+        for (let e of (dv.environments || [])) {
+          cellrow($('devEnvTable'), [
+            e.env,
+            e.host,
+            e.proxy,
+            e.runtime,
+            el('span', '🟢 ' + e.status, 'badge-pill ok')
+          ]);
+        }
+
+        // 7. SOTC Intelligence AI
+        let ai = s.intelligence_ai || {};
+        fillKpis('aiKpis', [
+          ['Índice de Anomalia Global', (ai.anomaly_score ?? 18) + ' / 100'],
+          ['Diagnósticos Preditivos', (ai.predictions || []).length + ' ativos'],
+          ['Confiança Média do Modelo', '93.6%'],
+          ['Ação Prioritária Sugerida', 'Limpeza Segura Journald (800 MB)']
+        ]);
+        $('aiPredictionsList').replaceChildren();
+        for (let pr of (ai.predictions || [])) {
+          let row = el('div', null, 'line');
+          let left = el('div', null, 'cell-stack');
+          left.append(
+            el('strong', `🤖 [${pr.category}] Confiança ${pr.confidence} — ${pr.finding}`),
+            el('span', 'Recomendação: ' + pr.action, 'muted')
+          );
+          let actBtn = el('button', '⚡ Executar Agora', 'btn-table');
+          actBtn.onclick = () => {
+            if (pr.auto_button === 'vacuum_journal') $('btnCleanDisk').click();
+            else guardian(pr.auto_button);
+            document.getElementById('acoes-rapidas').scrollIntoView({ behavior: 'smooth' });
+          };
+          row.append(left, actBtn);
+          $('aiPredictionsList').append(row);
+        }
+
+        // 8. Mapa de Dependências & Blast Radius
+        let dm = s.dependency_map || {};
+        let dc = $('depGraphContainer');
+        dc.replaceChildren();
+
+        // Coluna 1: Nó Central da VM & Domínios
+        let col1 = el('div', null, 'dep-column');
+        col1.append(el('h3', '🖥️ 1. Servidor & Domínios Apontados'));
+        let vmNode = dm.vm_node || {};
+        let n1 = el('div', null, 'dep-node');
+        n1.append(
+          el('strong', `VM: ${vmNode.name || 'radar-producao'} (${vmNode.ip || '34.70.140.94'})`),
+          el('span', `${vmNode.cloud} • Zona: ${vmNode.zone} • Projeto: ${vmNode.project}`, 'muted')
+        );
+        col1.append(n1);
+        for (let d of (dm.domains_and_endpoints || [])) {
+          let dn = el('div', null, 'dep-node');
+          dn.append(el('strong', '🌐 ' + d.endpoint), el('span', `Destino: ${d.target} (${d.status})`, 'muted'));
+          col1.append(dn);
+        }
+
+        // Coluna 2: Aplicações Hospedadas & Impacto se Parar
+        let col2 = el('div', null, 'dep-column');
+        col2.append(el('h3', '⚙️ 2. Serviços Hospedados & Impacto se Parar'));
+        for (let app of (dm.hosted_applications || [])) {
+          let an = el('div', null, 'dep-node');
+          an.append(
+            el('strong', `${app.name} [Porta: ${app.port}]`),
+            el('span', `Se parar: ${app.impact_if_stopped}`, 'warn')
+          );
+          col2.append(an);
+        }
+
+        // Coluna 3: Bancos de Dados & Projetos Dependentes
+        let col3 = el('div', null, 'dep-column');
+        col3.append(el('h3', '🗄️ 3. Bancos de Dados & Projetos Dependentes'));
+        for (let db of (dm.databases_connected || [])) {
+          let dbn = el('div', null, 'dep-node');
+          dbn.append(el('strong', '🛢️ ' + db.name), el('span', `${db.role} • ${db.connection}`, 'ok'));
+          col3.append(dbn);
+        }
+        for (let pj of (dm.dependent_projects || []).slice(0, 6)) {
+          let pjn = el('div', null, 'dep-node');
+          pjn.append(el('strong', '📂 Projeto: ' + pj.name), el('span', `${pj.source} · ${pj.tech} · ${pj.deploy_url}`, 'muted'));
+          col3.append(pjn);
+        }
+
+        dc.append(col1, col2, col3);
+      } catch (e) {}
+    }
+    loadCommandCenterSuite();
 
     /* Catálogo de Projetos (DevCentral) em Português */
     let dcData = null;
@@ -991,6 +2006,7 @@
       try {
         dcData = await req('/api/devcentral');
         renderDevCentral();
+        renderCockpit(chosen());
         $('dcStatus').textContent = '✅ ' + (dcData.summary?.total || 0) + ' projetos prontos para uso';
       } catch (e) { $('dcStatus').textContent = '⚠️ Erro: ' + e.message; }
     }

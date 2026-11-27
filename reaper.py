@@ -39,5 +39,6 @@ def execute(vm,item):
     if action in ('start','stop','reboot'):
         if vm.get('allow_power') is not True: raise ValueError('Energia bloqueada: habilite allow_power no inventário local após revisar a VM.')
         if item.get('confirm')!=alias+' '+action: raise ValueError('Confirmação incorreta')
+        guardian.check_rate_limit(f'{alias}:power:{action}', cooldown_sec=30)
         return guardian.run(power_args(vm,action),timeout=90)
     raise ValueError('Operação desconhecida')

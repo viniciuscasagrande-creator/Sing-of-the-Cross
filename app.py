@@ -73,7 +73,7 @@ def probe(vm):
     if not shutil.which('ssh'):
         out['detail']='Cliente OpenSSH não encontrado'; return out
     # Detecta processos remotos e mede latência SSH (descontando o sleep 1 da amostragem de CPU).
-    command="printf 'SOTC_HOST '; hostname; printf 'SOTC_UP '; cut -d. -f1 /proc/uptime; printf 'SOTC_CORES '; getconf _NPROCESSORS_ONLN; printf 'SOTC_CPU '; awk '/^cpu / {print $2+$3+$4+$5+$6+$7+$8, $5+$6}' /proc/stat; sleep 1; printf 'SOTC_CPU '; awk '/^cpu / {print $2+$3+$4+$5+$6+$7+$8, $5+$6}' /proc/stat; printf 'SOTC_RAM '; free -m | awk '/^Mem:/ {print $3, $2}'; printf 'SOTC_DISK '; df -P / | awk 'NR==2 {print $5}'; printf 'SOTC_LOAD '; cat /proc/loadavg; ps -eo args | grep -E '[.]vscode-server|[.]vscode-remote|[.]vscode-server-insiders' >/dev/null && echo SOTC_SERVER_PRESENT || echo SOTC_SERVER_NOT_DETECTED"
+    command="printf 'SOTC_HOST '; hostname; printf 'SOTC_UP '; cut -d. -f1 /proc/uptime; printf 'SOTC_CORES '; getconf _NPROCESSORS_ONLN; printf 'SOTC_CPU '; awk '/^cpu / {print $2+$3+$4+$5+$6+$7+$8, $5+$6}' /proc/stat; sleep 1; printf 'SOTC_CPU '; awk '/^cpu / {print $2+$3+$4+$5+$6+$7+$8, $5+$6}' /proc/stat; printf 'SOTC_RAM '; free -m | awk '/^Mem:/ {print $3, $2}'; printf 'SOTC_SWAP '; free -m | awk '/^Swap:/ {print $3, $2}'; printf 'SOTC_DISK '; df -P / | awk 'NR==2 {print $5, $3, $2}'; printf 'SOTC_LOAD '; cat /proc/loadavg; printf 'SOTC_NET '; awk '/:/ && $1!~\"lo:\" {rx+=$2; tx+=$10} END {print rx+0, tx+0}' /proc/net/dev; printf 'SOTC_PROCS '; ps -e --no-headers | wc -l; ps -eo args | grep -E '[.]vscode-server|[.]vscode-remote|[.]vscode-server-insiders' >/dev/null && echo SOTC_SERVER_PRESENT || echo SOTC_SERVER_NOT_DETECTED"
     t0=time.monotonic()
     try:
         p=subprocess.run(['ssh','-o','BatchMode=yes','-o','StrictHostKeyChecking=yes','-o','ConnectTimeout=5','-o','ConnectionAttempts=1','-o','ClearAllForwardings=yes','-o','RequestTTY=no',vm['ssh'],command],capture_output=True,text=True,timeout=12)
@@ -86,15 +86,33 @@ def probe(vm):
                 if line.startswith('SOTC_CPU '):
                     try: cpu.append(tuple(map(float,line.split()[1:3])))
                     except ValueError: pass
-                for key,field in [('HOST','hostname'),('UP','uptime'),('CORES','cores')]:
-                    if line.startswith('SOTC_'+key+' '): out[field]=line.split(' ',1)[1]
+                for key,field in [('HOST','hostname'),('UP','uptime'),('CORES','cores'),('PROCS','proc_count')]:
+                    if line.startswith('SOTC_'+key+' '): out[field]=line.split(' ',1)[1].strip()
 
                 if line.startswith('SOTC_RAM '):
                     try:
-                        used,total=map(int,line.split()[1:3]); out['ram_pct']=round(100*used/total,1)
+                        used,total=map(int,line.split()[1:3]); out['ram_pct']=round(100*used/total,1); out['ram_used_mb']=used; out['ram_total_mb']=total
                     except (ValueError,ZeroDivisionError): pass
-                elif line.startswith('SOTC_DISK '): out['disk_pct']=line.split()[-1]
-                elif line.startswith('SOTC_LOAD '): out['load']=line.split()[1] if len(line.split())>1 else None
+                elif line.startswith('SOTC_SWAP '):
+                    try:
+                        s_used,s_total=map(int,line.split()[1:3]); out['swap_pct']=round(100*s_used/s_total,1) if s_total>0 else 0.0; out['swap_used_mb']=s_used; out['swap_total_mb']=s_total
+                    except (ValueError,ZeroDivisionError): pass
+                elif line.startswith('SOTC_DISK '):
+                    parts=line.split()
+                    if len(parts)>=2: out['disk_pct']=parts[1]
+                    if len(parts)>=4:
+                        try:
+                            out['disk_used_gb']=round(int(parts[2])/1048576,2)
+                            out['disk_total_gb']=round(int(parts[3])/1048576,2)
+                        except ValueError: pass
+                elif line.startswith('SOTC_LOAD '):
+                    lparts=line.split()
+                    if len(lparts)>=4:
+                        out['load1']=lparts[1]; out['load5']=lparts[2]; out['load15']=lparts[3]; out['load']=lparts[1]
+                elif line.startswith('SOTC_NET '):
+                    try:
+                        rx_b,tx_b=map(int,line.split()[1:3]); out['net_rx_mb']=round(rx_b/1048576,1); out['net_tx_mb']=round(tx_b/1048576,1)
+                    except ValueError: pass
             if 'SOTC_SERVER_PRESENT' in p.stdout.splitlines(): out['server_status']='present'
             elif 'SOTC_SERVER_NOT_DETECTED' in p.stdout.splitlines(): out['server_status']='not_detected'
             if len(cpu)==2 and cpu[1][0]>cpu[0][0]: out['cpu_pct']=round(max(0,min(100,100*(1-(cpu[1][1]-cpu[0][1])/(cpu[1][0]-cpu[0][0])))),1)
@@ -159,6 +177,14 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_data(json.dumps(devcentral_bridge.fetch_sentinel_status(),ensure_ascii=False).encode())
             elif path=='/api/oracle':
                 self.send_data(json.dumps(oracle.analyze_infrastructure(status()),ensure_ascii=False).encode())
+            elif path=='/api/command-center':
+                vms_st = status()
+                try: dc_ov = devcentral_bridge.fetch_overview()
+                except Exception: dc_ov = {}
+                try: sent_st = devcentral_bridge.fetch_sentinel_status()
+                except Exception: sent_st = {}
+                suite = oracle.build_command_center_suite(vms_st, dc_ov, sent_st, guardian.events())
+                self.send_data(json.dumps(suite,ensure_ascii=False).encode())
             elif path=='/api/history': self.send_data(json.dumps(history(),ensure_ascii=False).encode())
             elif path=='/api/aliases': self.send_data(json.dumps(aliases()).encode())
             elif path=='/api/status':
@@ -167,6 +193,16 @@ class Handler(BaseHTTPRequestHandler):
             else: self.send_error(404)
         except Exception as e: self.send_data(json.dumps({'error':str(e)}).encode(),status=500)
 
+def _background_collector_worker():
+    """Worker independente do navegador: coleta telemetria e sincroniza com SQLite + Neon a cada 30s."""
+    while True:
+        try:
+            status()
+        except Exception:
+            pass
+        time.sleep(30)
+
 if __name__=='__main__':
-    print('Sing Of The Cross V0.7 The Sentinel: http://127.0.0.1:8765')
+    threading.Thread(target=_background_collector_worker, daemon=True).start()
+    print('Sing Of The Cross V1.0 Multi-Cloud Command Center (Worker 24/7 Ativo): http://127.0.0.1:8765')
     ThreadingHTTPServer(('127.0.0.1',8765),Handler).serve_forever()
