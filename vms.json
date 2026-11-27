@@ -1,0 +1,22 @@
+[
+  {
+    "id": "SOTC-GCP-001",
+    "name": "radar-producao",
+    "cloud": "Google Cloud",
+    "project": "gen-lang-client-0023634133",
+    "region": "us-central1",
+    "zone": "us-central1-a",
+    "environment": "Produção",
+    "machine_type": "e2-medium",
+    "ssh": "radar-producao",
+    "host": "34.70.140.94",
+    "internal_ip": "10.128.0.2",
+    "user": "vinad",
+    "port": 22,
+    "identity_file": "~/.ssh/google_compute_engine",
+    "workspace": "/home/vinad",
+    "console_url": "https://console.cloud.google.com/compute/instancesDetail/zones/us-central1-a/instances/radar-producao?project=gen-lang-client-0023634133",
+    "ssh_browser_url": "https://ssh.cloud.google.com/projects/gen-lang-client-0023634133/zones/us-central1-a/instances/radar-producao?authuser=0&hl=pt_BR&useAdminProxy=true&troubleshoot4005=true&sshOnCloud=true",
+    "mode": "real"
+  }
+]

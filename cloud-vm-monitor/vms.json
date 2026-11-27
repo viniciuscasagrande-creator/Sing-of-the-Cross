@@ -1,0 +1,101 @@
+{
+  "refreshIntervalSeconds": 10,
+  "sshTimeoutSeconds": 4,
+  "autoDiscoverSshConfig": true,
+  "vms": [
+    {
+      "id": "vm-dev",
+      "name": "VM-Desenvolvimento",
+      "host": "10.0.0.10",
+      "user": "ubuntu",
+      "port": 22,
+      "provider": "gcp",
+      "connectionType": "ssh",
+      "tunnelName": "",
+      "workspacePath": "/home/ubuntu/app",
+      "identityFile": "",
+      "demoMode": true,
+      "demoState": {
+        "vmOnline": true,
+        "vscodeConnected": true,
+        "activeSessions": 2,
+        "cpu": 24,
+        "ram": 42,
+        "disk": 35,
+        "uptime": "14d 06h 22m",
+        "os": "Ubuntu 24.04 LTS"
+      }
+    },
+    {
+      "id": "vm-prod",
+      "name": "VM-Produção",
+      "host": "10.0.0.11",
+      "user": "admin",
+      "port": 22,
+      "provider": "aws",
+      "connectionType": "ssh",
+      "tunnelName": "",
+      "workspacePath": "/var/www/production",
+      "identityFile": "",
+      "demoMode": true,
+      "demoState": {
+        "vmOnline": true,
+        "vscodeConnected": true,
+        "activeSessions": 1,
+        "cpu": 38,
+        "ram": 65,
+        "disk": 58,
+        "uptime": "42d 19h 10m",
+        "os": "Debian 12 (Bookworm)"
+      }
+    },
+    {
+      "id": "vm-test",
+      "name": "VM-Testes",
+      "host": "10.0.0.12",
+      "user": "azureuser",
+      "port": 22,
+      "provider": "azure",
+      "connectionType": "tunnel",
+      "tunnelName": "vm-testes-tunnel",
+      "workspacePath": "/home/azureuser/tests",
+      "identityFile": "",
+      "demoMode": true,
+      "demoState": {
+        "vmOnline": true,
+        "vscodeConnected": false,
+        "vscodeServerRunning": true,
+        "activeSessions": 0,
+        "cpu": 5,
+        "ram": 18,
+        "disk": 21,
+        "uptime": "3d 11h 04m",
+        "os": "Ubuntu 22.04 LTS"
+      }
+    },
+    {
+      "id": "vm-backup",
+      "name": "VM-Backup",
+      "host": "10.0.0.13",
+      "user": "opc",
+      "port": 22,
+      "provider": "oci",
+      "connectionType": "ssh",
+      "tunnelName": "",
+      "workspacePath": "/mnt/backups",
+      "identityFile": "",
+      "demoMode": true,
+      "demoState": {
+        "vmOnline": false,
+        "vscodeConnected": false,
+        "vscodeServerRunning": false,
+        "activeSessions": 0,
+        "cpu": 0,
+        "ram": 0,
+        "disk": 74,
+        "uptime": "Offline",
+        "os": "Oracle Linux 9"
+      }
+    }
+  ]
+}

@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cloud VM Monitor • Painel de Conexões VS Code</title>
+  <style>
+    :root {
+      --bg-main: #0b0f19;
+      --bg-card: #131a2a;
+      --bg-card-hover: #182136;
+      --border: #23304d;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --accent-blue: #3b82f6;
+      --accent-blue-hover: #2563eb;
+      --green: #10b981;
+      --green-bg: rgba(16, 185, 129, 0.14);
+      --yellow: #f59e0b;
+      --yellow-bg: rgba(245, 158, 11, 0.14);
+      --red: #ef4444;
+      --red-bg: rgba(239, 68, 68, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at top right, #162038 0%, var(--bg-main) 55%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 28px 24px 48px;
+    }
+
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+    }
+
+    /* Cabeçalho */
+    .header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 22px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+
+    .title-group h1 {
+      font-size: 1.85rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .title-badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(59, 130, 246, 0.16);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.35);
+    }
+
+    .title-group p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin-top: 4px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .refresh-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.45; transform: scale(1.25); }
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 15px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      transition: all 0.18s ease;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background: var(--bg-card-hover);
+      border-color: #384d7a;
+    }
+
+    .btn-primary {
+      background: var(--accent-blue);
+      border-color: var(--accent-blue);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-blue-hover);
+      border-color: var(--accent-blue-hover);
+    }
+
+    .btn-sm {
+      padding: 6px 11px;
+      font-size: 0.8rem;
+      border-radius: 8px;
+    }
+
+    /* Cards de Resumo (Total, Conectadas, Desconectadas) */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .summary-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .summary-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--accent-blue);
+    }
+
+    .summary-card.green::before { background: var(--green); }
+    .summary-card.yellow::before { background: var(--yellow); }
+    .summary-card.red::before { background: var(--red); }
+
+    .summary-label {
+      color: var(--text-secondary);
+      font-size: 0.88rem;
+      font-weight: 500;
+    }
+
+    .summary-value {
+      font-size: 2.35rem;
+      font-weight: 800;
+      margin-top: 6px;
+      letter-spacing: -0.03em;
+    }
+
+    .summary-sub {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    /* Barra de Legenda e Filtros */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding: 12px 16px;
+      background: rgba(19, 26, 42, 0.75);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .legend-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      font-size: 0.84rem;
+      color: var(--text-secondary);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .dot.green { background: var(--green); box-shadow: 0 0 8px var(--green); }
+    .dot.yellow { background: var(--yellow); box-shadow: 0 0 8px var(--yellow); }
+    .dot.red { background: var(--red); box-shadow: 0 0 8px var(--red); }
+
+    /* Grid de VMs */
+    .vm-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(365px, 1fr));
+      gap: 18px;
+    }
+
+    .vm-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 16px;
+      position: relative;
+    }
+
+    .vm-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+    }
+
+    .vm-card.status-green { border-top: 4px solid var(--green); }
+    .vm-card.status-yellow { border-top: 4px solid var(--yellow); }
+    .vm-card.status-red { border-top: 4px solid var(--red); }
+
+    .vm-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .vm-name {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .vm-host {
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .provider-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .tag {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-secondary);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .tag.demo {
+      background: rgba(139, 92, 246, 0.15);
+      color: #c4b5fd;
+      border-color: rgba(139, 92, 246, 0.35);
+    }
+
+    /* Badges de Status da VM e VS Code */
+    .status-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .status-box {
+      background: rgba(11, 15, 25, 0.55);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+
+    .status-box-label {
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    .status-pill.online { color: var(--green); }
+    .status-pill.standby { color: var(--yellow); }
+    .status-pill.offline { color: var(--red); }
+
+    /* Barras de CPU, RAM, Disco */
+    .metrics-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: rgba(11, 15, 25, 0.4);
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(35, 48, 77, 0.7);
+    }
+
+    .metric-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .metric-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+    }
+
+    .metric-name {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .metric-val {
+      font-weight: 700;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 7px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.4s ease;
+    }
+
+    .meta-line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      padding-top: 2px;
+    }
+
+    /* Botões de Ação no Card */
+    .card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-top: 4px;
+      border-top: 1px solid rgba(35, 48, 77, 0.6);
+    }
+
+    .card-actions .btn-vscode {
+      flex: 1;
+      justify-content: center;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      border-color: #3b82f6;
+      color: white;
+    }
+
+    .card-actions .btn-vscode:hover {
+      background: linear-gradient(135deg, #1d4ed8, #1e40af);
+    }
+
+    /* Controles rápidos de simulação quando em Demo Mode */
+    .demo-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      background: rgba(139, 92, 246, 0.08);
+      border: 1px dashed rgba(139, 92, 246, 0.35);
+      padding: 7px 10px;
+      border-radius: 8px;
+    }
+
+    .demo-btns {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* Modal de Nova VM / Descoberta */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 8, 15, 0.78);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      padding: 16px;
+    }
+
+    .modal-backdrop.active {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      max-width: 560px;
+      width: 100%;
+      padding: 24px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal h2 {
+      font-size: 1.25rem;
+      margin-bottom: 16px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-bottom: 12px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    .form-group label {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group select {
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #0b0f19;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      background: #1e293b;
+      border: 1px solid #3b82f6;
+      color: var(--text-primary);
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.45);
+      display: none;
+      z-index: 100;
+    }
+
+    .footer-note {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.84rem;
+      margin-top: 32px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Cabeçalho -->
+    <header class="header">
+      <div class="title-group">
+        <h1>
+          Cloud VM Monitor
+          <span class="title-badge">Multi-Cloud &amp; VS Code Remote</span>
+        </h1>
+        <p>Painel centralizado de conexões VS Code (Remote SSH &amp; Remote Tunnels)</p>
+      </div>
+
+      <div class="header-actions">
+        <div class="refresh-pill">
+          <span class="pulse-dot"></span>
+          <span>Atualização a cada <strong id="interval-label">10</strong>s • <span id="countdown-label">10s</span></span>
+        </div>
+        <button class="btn" onclick="fetchStatuses(true)">🔄 Atualizar Agora</button>
+        <button class="btn" onclick="openDiscoverModal()">🔍 Descobrir VMs (Cloud/SSH)</button>
+        <button class="btn btn-primary" onclick="openAddModal()">➕ Adicionar VM</button>
+      </div>
+    </header>
+
+    <!-- Cards de Resumo -->
+    <section class="summary-grid">
+      <div class="summary-card">
+        <span class="summary-label">Total de VMs</span>
+        <div class="summary-value" id="sum-total">4</div>
+        <span class="summary-sub" id="sum-online">3 Online • 1 Offline</span>
+      </div>
+      <div class="summary-card green">
+        <span class="summary-label">Conectadas ao VS Code</span>
+        <div class="summary-value" id="sum-connected" style="color: var(--green);">2</div>
+        <span class="summary-sub">Sessão ativa com Extension Host</span>
+      </div>
+      <div class="summary-card yellow">
+        <span class="summary-label">Desconectadas do VS Code</span>
+        <div class="summary-value" id="sum-disconnected" style="color: var(--yellow);">2</div>
+        <span class="summary-sub" id="sum-standby">1 VM ligada aguardando • 1 VM offline</span>
+      </div>
+    </section>
+
+    <!-- Legenda Semafórica -->
+    <section class="toolbar">
+      <div class="legend-items">
+        <div class="legend-item">
+          <span class="dot green"></span>
+          <span><strong>Verde:</strong> VM ligada e VS Code conectado</span>
+        </div>
+        <div class="legend-item">
+          <span class="dot yellow"></span>
+          <span><strong>Amarelo:</strong> VM ligada, mas VS Code desconectado</span>
+        </div>
+        <div class="legend-item">
+          <span class="dot red"></span>
+          <span><strong>Vermelho:</strong> VM desligada ou inacessível</span>
+        </div>
+      </div>
+      <div style="font-size: 0.8rem; color: var(--text-secondary);">
+        Última verificação: <strong id="last-checked">--:--:--</strong>
+      </div>
+    </section>
+
+    <!-- Grid de Cartões das VMs -->
+    <main class="vm-grid" id="vm-grid"></main>
+
+    <div class="footer-note">
+      Modelo visual e operacional • Suporta Google Cloud (GCP), AWS, Azure, Oracle Cloud (OCI), SSH direto e VS Code Remote Tunnels
+    </div>
+  </div>
+
+  <!-- Modal: Adicionar / Editar VM -->
+  <div class="modal-backdrop" id="vm-modal">
+    <div class="modal">
+      <h2 id="modal-title">Adicionar / Configurar VM</h2>
+      <form id="vm-form" onsubmit="saveVm(event)">
+        <input type="hidden" id="vm-id" />
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nome da VM</label>
+            <input type="text" id="vm-name" placeholder="Ex: VM-Desenvolvimento" required />
+          </div>
+          <div class="form-group">
+            <label>Provedor Cloud</label>
+            <select id="vm-provider">
+              <option value="gcp">Google Cloud (GCP)</option>
+              <option value="aws">AWS EC2</option>
+              <option value="azure">Microsoft Azure</option>
+              <option value="oci">Oracle Cloud (OCI)</option>
+              <option value="ssh">Servidor SSH / IP Fixo</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>IP ou Hostname SSH</label>
+            <input type="text" id="vm-host" placeholder="Ex: 10.0.0.10 ou meu-host" required />
+          </div>
+          <div class="form-group">
+            <label>Usuário SSH</label>
+            <input type="text" id="vm-user" placeholder="ubuntu" value="ubuntu" required />
+          </div>
+          <div class="form-group">
+            <label>Porta SSH</label>
+            <input type="number" id="vm-port" value="22" required />
+          </div>
+          <div class="form-group">
+            <label>Modo de Conexão VS Code</label>
+            <select id="vm-conn-type">
+              <option value="ssh">Remote - SSH</option>
+              <option value="tunnel">Remote Tunnels (code tunnel)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Nome do Tunnel (se usar Remote Tunnel)</label>
+            <input type="text" id="vm-tunnel" placeholder="Ex: vm-dev-tunnel" />
+          </div>
+          <div class="form-group">
+            <label>Caminho do Projeto Remoto</label>
+            <input type="text" id="vm-workspace" placeholder="/home/ubuntu/app" />
+          </div>
+          <div class="form-group full">
+            <label>Chave SSH Privada (opcional, padrão usa ~/.ssh/id_rsa ou ~/.ssh/config)</label>
+            <input type="text" id="vm-key" placeholder="Ex: ~/.ssh/id_ed25519" />
+          </div>
+          <div class="form-group full">
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color: var(--text-primary);">
+              <input type="checkbox" id="vm-demo" />
+              Usar Modo Demonstração (dados simulados; desmarque para monitorar via SSH real)
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn" onclick="closeVmModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar VM</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Auto-descoberta Cloud & ~/.ssh/config -->
+  <div class="modal-backdrop" id="discover-modal">
+    <div class="modal">
+      <h2>VMs Descobertas (~/.ssh/config &amp; Cloud CLIs)</h2>
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">
+        Verificamos automaticamente seu arquivo <code>~/.ssh/config</code> e as CLIs <code>gcloud</code>, <code>aws</code> e <code>az</code>:
+      </p>
+      <div id="discover-list" style="display:flex; flex-direction:column; gap:10px; max-height: 320px; overflow-y:auto;"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn" onclick="closeDiscoverModal()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let currentVms = [];
+    let refreshSeconds = 10;
+    let countdown = 10;
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 4000);
+    }
+
+    function barColor(pct) {
+      if (pct >= 80) return 'var(--red)';
+      if (pct >= 60) return 'var(--yellow)';
+      return 'var(--accent-blue)';
+    }
+
+    function providerLabel(p) {
+      const map = {
+        gcp: 'GCP',
+        aws: 'AWS',
+        azure: 'Azure',
+        oci: 'Oracle OCI',
+        ssh: 'SSH Direto'
+      };
+      return map[p] || (p || 'SSH').toUpperCase();
+    }
+
+    function renderDashboard(data) {
+      const { summary, vms } = data;
+      currentVms = vms;
+      refreshSeconds = summary.refreshIntervalSeconds || 10;
+      document.getElementById('interval-label').textContent = refreshSeconds;
+
+      document.getElementById('sum-total').textContent = summary.total;
+      document.getElementById('sum-online').textContent = `${summary.online} Online • ${summary.offline} Offline`;
+      document.getElementById('sum-connected').textContent = summary.connected;
+      document.getElementById('sum-disconnected').textContent = summary.disconnected;
+      document.getElementById('sum-standby').textContent =
+        `${summary.standby} VM(s) ligada(s) sem sessão • ${summary.offline} VM(s) desligada(s)`;
+
+      const now = new Date(summary.timestamp);
+      document.getElementById('last-checked').textContent = now.toLocaleTimeString('pt-BR');
+
+      const grid = document.getElementById('vm-grid');
+      grid.innerHTML = vms.map(vm => {
+        const st = vm.status;
+        const ind = st.indicator; // green | yellow | red
+
+        const vmStateBadge = st.vmOnline
+          ? `<span class="status-pill online">● Online</span>`
+          : `<span class="status-pill offline">● Offline</span>`;
+
+        let vscodeStateBadge = `<span class="status-pill offline">● Desconectado</span>`;
+        if (st.vmOnline && st.vscodeConnected) {
+          vscodeStateBadge = `<span class="status-pill online">● Conectado (${st.activeSessions})</span>`;
+        } else if (st.vmOnline && !st.vscodeConnected) {
+          vscodeStateBadge = `<span class="status-pill standby">● Desconectado</span>`;
+        }
+
+        const connLabel = vm.connectionType === 'tunnel' ? 'Remote Tunnel' : 'Remote SSH';
+        const wsPath = (vm.workspacePath || `/home/${vm.user || 'ubuntu'}`).replace(/^\/+/, '');
+        const vscodeUri = vm.connectionType === 'tunnel' && vm.tunnelName
+          ? `vscode://vscode-remote/tunnel+${vm.tunnelName}/${wsPath}`
+          : `vscode://vscode-remote/ssh-remote+${vm.user ? vm.user + '@' + vm.host : vm.host}/${wsPath}`;
+
+        const metricsHtml = st.vmOnline ? `
+          <div class="metrics-section">
+            <div class="metric-row">
+              <div class="metric-header">
+                <span class="metric-name">CPU</span>
+                <span class="metric-val">${st.cpu}%</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width:${st.cpu}%; background:${barColor(st.cpu)};"></div>
+              </div>
+            </div>
+            <div class="metric-row">
+              <div class="metric-header">
+                <span class="metric-name">RAM</span>
+                <span class="metric-val">${st.ram}%</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width:${st.ram}%; background:${barColor(st.ram)};"></div>
+              </div>
+            </div>
+            <div class="metric-row">
+              <div class="metric-header">
+                <span class="metric-name">Disco (/)</span>
+                <span class="metric-val">${st.disk}%</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width:${st.disk}%; background:${barColor(st.disk)};"></div>
+              </div>
+            </div>
+            <div class="meta-line">
+              <span>SO: ${st.os}</span>
+              <span>Uptime: ${st.uptime}</span>
+            </div>
+          </div>
+        ` : `
+          <div class="metrics-section" style="text-align:center; padding: 24px 12px; color: var(--text-secondary);">
+            <div style="font-size: 0.9rem; font-weight: 600; color: var(--red); margin-bottom: 4px;">
+              Máquina Desligada ou Inacessível
+            </div>
+            <div style="font-size: 0.78rem;">
+              ${st.error ? st.error : 'Sem resposta SSH na porta ' + (vm.port || 22)}
+            </div>
+          </div>
+        `;
+
+        const demoControlsHtml = vm.demoMode ? `
+          <div class="demo-controls">
+            <span>Simulação (Demo):</span>
+            <div class="demo-btns">
+              <button class="btn btn-sm" onclick="toggleDemo('${vm.id}', 'vmOnline')">
+                ${st.vmOnline ? 'Desligar VM' : 'Ligar VM'}
+              </button>
+              <button class="btn btn-sm" onclick="toggleDemo('${vm.id}', 'vscodeConnected')" ${!st.vmOnline ? 'disabled style="opacity:0.4;cursor:not-allowed;"' : ''}>
+                ${st.vscodeConnected ? 'Desconectar VS Code' : 'Conectar VS Code'}
+              </button>
+            </div>
+          </div>
+        ` : '';
+
+        return `
+          <article class="vm-card status-${ind}">
+            <div>
+              <div class="vm-top">
+                <div>
+                  <div class="vm-name">
+                    <span class="dot ${ind}"></span>
+                    ${vm.name}
+                  </div>
+                  <div class="vm-host">${vm.user ? vm.user + '@' : ''}${vm.host}:${vm.port || 22}</div>
+                </div>
+                <div class="provider-tags">
+                  <span class="tag">${providerLabel(vm.provider)}</span>
+                  <span class="tag">${connLabel}</span>
+                  ${vm.demoMode ? '<span class="tag demo">Demo</span>' : '<span class="tag" style="color:var(--green);">SSH Real</span>'}
+                </div>
+              </div>
+
+              <div class="status-row" style="margin-top: 14px;">
+                <div class="status-box">
+                  <div class="status-box-label">Estado da VM</div>
+                  ${vmStateBadge}
+                </div>
+                <div class="status-box">
+                  <div class="status-box-label">VS Code</div>
+                  ${vscodeStateBadge}
+                </div>
+              </div>
+            </div>
+
+            ${metricsHtml}
+            ${demoControlsHtml}
+
+            <div class="card-actions">
+              <button class="btn btn-vscode" onclick="openInVsCode('${vm.id}', '${vscodeUri}')">
+                💻 Abrir no VS Code
+              </button>
+              <button class="btn btn-sm" title="Alternar SSH Real / Demo" onclick="toggleDemo('${vm.id}', 'demoMode')">
+                ${vm.demoMode ? '📡 Usar SSH Real' : '🧪 Usar Demo'}
+              </button>
+              <button class="btn btn-sm" title="Editar VM" onclick="editVm('${vm.id}')">⚙️</button>
+              <button class="btn btn-sm" title="Remover VM" onclick="deleteVm('${vm.id}')">🗑️</button>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    async function fetchStatuses(manual = false) {
+      try {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        renderDashboard(data);
+        countdown = refreshSeconds;
+        if (manual) showToast('Status das VMs atualizado!');
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function toggleDemo(id, field) {
+      await fetch('/api/vms/toggle-demo-state', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, field })
+      });
+      fetchStatuses();
+    }
+
+    async function openInVsCode(id, fallbackUri) {
+      showToast('Abrindo conexão remota no VS Code...');
+      try {
+        const res = await fetch('/api/open-vscode', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+        const data = await res.json();
+        if (data.uri) {
+          window.location.href = data.uri;
+        }
+      } catch (e) {
+        window.location.href = fallbackUri;
+      }
+    }
+
+    function openAddModal() {
+      document.getElementById('modal-title').textContent = 'Adicionar Nova VM';
+      document.getElementById('vm-id').value = '';
+      document.getElementById('vm-name').value = '';
+      document.getElementById('vm-host').value = '';
+      document.getElementById('vm-user').value = 'ubuntu';
+      document.getElementById('vm-port').value = '22';
+      document.getElementById('vm-provider').value = 'gcp';
+      document.getElementById('vm-conn-type').value = 'ssh';
+      document.getElementById('vm-tunnel').value = '';
+      document.getElementById('vm-workspace').value = '/home/ubuntu';
+      document.getElementById('vm-key').value = '';
+      document.getElementById('vm-demo').checked = false;
+      document.getElementById('vm-modal').classList.add('active');
+    }
+
+    function editVm(id) {
+      const vm = currentVms.find(v => v.id === id);
+      if (!vm) return;
+      document.getElementById('modal-title').textContent = `Configurar ${vm.name}`;
+      document.getElementById('vm-id').value = vm.id;
+      document.getElementById('vm-name').value = vm.name;
+      document.getElementById('vm-host').value = vm.host;
+      document.getElementById('vm-user').value = vm.user || 'ubuntu';
+      document.getElementById('vm-port').value = vm.port || 22;
+      document.getElementById('vm-provider').value = vm.provider || 'ssh';
+      document.getElementById('vm-conn-type').value = vm.connectionType || 'ssh';
+      document.getElementById('vm-tunnel').value = vm.tunnelName || '';
+      document.getElementById('vm-workspace').value = vm.workspacePath || `/home/${vm.user || 'ubuntu'}`;
+      document.getElementById('vm-key').value = vm.identityFile || '';
+      document.getElementById('vm-demo').checked = Boolean(vm.demoMode);
+      document.getElementById('vm-modal').classList.add('active');
+    }
+
+    function closeVmModal() {
+      document.getElementById('vm-modal').classList.remove('active');
+    }
+
+    async function saveVm(e) {
+      e.preventDefault();
+      const payload = {
+        id: document.getElementById('vm-id').value || undefined,
+        name: document.getElementById('vm-name').value.trim(),
+        host: document.getElementById('vm-host').value.trim(),
+        user: document.getElementById('vm-user').value.trim(),
+        port: parseInt(document.getElementById('vm-port').value, 10) || 22,
+        provider: document.getElementById('vm-provider').value,
+        connectionType: document.getElementById('vm-conn-type').value,
+        tunnelName: document.getElementById('vm-tunnel').value.trim(),
+        workspacePath: document.getElementById('vm-workspace').value.trim(),
+        identityFile: document.getElementById('vm-key').value.trim(),
+        demoMode: document.getElementById('vm-demo').checked
+      };
+
+      await fetch('/api/vms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      closeVmModal();
+      showToast('VM salva com sucesso!');
+      fetchStatuses();
+    }
+
+    async function deleteVm(id) {
+      const vm = currentVms.find(v => v.id === id);
+      if (!vm || !confirm(`Remover "${vm.name}" do painel?`)) return;
+      await fetch('/api/vms/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+      showToast('VM removida.');
+      fetchStatuses();
+    }
+
+    async function openDiscoverModal() {
+      const modal = document.getElementById('discover-modal');
+      const listEl = document.getElementById('discover-list');
+      listEl.innerHTML = '<div style="color:var(--text-secondary); padding: 12px;">Procurando VMs no ~/.ssh/config e CLIs Cloud...</div>';
+      modal.classList.add('active');
+
+      try {
+        const res = await fetch('/api/discover');
+        const data = await res.json();
+        const items = data.discovered || [];
+        if (items.length === 0) {
+          listEl.innerHTML = '<div style="color:var(--text-secondary); padding: 12px;">Nenhuma VM encontrada automaticamente em ~/.ssh/config ou nas CLIs autenticadas. Use o botão "Adicionar VM" para cadastrar manualmente.</div>';
+          return;
+        }
+        listEl.innerHTML = items.map((item, idx) => `
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:#0b0f19; border:1px solid var(--border); border-radius:10px;">
+            <div>
+              <div style="font-weight:700;">${item.name} <span class="tag">${item.source}</span></div>
+              <div style="font-size:0.8rem; color:var(--text-secondary);">${item.user}@${item.host}:${item.port}</div>
+            </div>
+            <button class="btn btn-sm btn-primary" onclick='importDiscovered(${JSON.stringify(item).replace(/'/g, "&#39;")})'>
+              Importar
+            </button>
+          </div>
+        `).join('');
+      } catch (e) {
+        listEl.innerHTML = '<div style="color:var(--red); padding: 12px;">Erro ao executar auto-descoberta.</div>';
+      }
+    }
+
+    function closeDiscoverModal() {
+      document.getElementById('discover-modal').classList.remove('active');
+    }
+
+    async function importDiscovered(item) {
+      await fetch('/api/vms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: item.name,
+          host: item.host,
+          user: item.user || 'ubuntu',
+          port: item.port || 22,
+          provider: item.provider || 'ssh',
+          connectionType: 'ssh',
+          identityFile: item.identityFile || '',
+          demoMode: false
+        })
+      });
+      closeDiscoverModal();
+      showToast(`VM "${item.name}" importada!`);
+      fetchStatuses();
+    }
+
+    // Timer de atualização automática a cada 10s
+    setInterval(() => {
+      countdown--;
+      if (countdown <= 0) {
+        fetchStatuses();
+        countdown = refreshSeconds;
+      }
+      document.getElementById('countdown-label').textContent = `${countdown}s`;
+    }, 1000);
+
+    fetchStatuses();
+  </script>
+</body>
+</html>
