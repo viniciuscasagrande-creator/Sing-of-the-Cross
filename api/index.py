@@ -1,7 +1,7 @@
 """
-Sing Of The Cross (SOTC) - Vercel Serverless Cloud Handler (V0.7 The Sentinel)
-Lê a telemetria espelhada das VMs, o status do Sentinel Agent (heartbeat/alertas)
-e os 42 projetos do DevCentral diretamente do banco Neon PostgreSQL.
+Sing Of The Cross (SOTC) - Vercel Serverless Cloud Handler (V1.0 The Throne & Mobile APK)
+Lê a telemetria espelhada das VMs, o status do Sentinel Agent (heartbeat/alertas),
+os 7 Dashboards Executivos e os 42 projetos do DevCentral diretamente do Neon PostgreSQL.
 """
 import json
 import sys
@@ -11,16 +11,19 @@ from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parent.parent
 BACKEND_DIR = ROOT / "backend"
-for p in (str(ROOT), str(BACKEND_DIR)):
-    if p not in sys.path:
-        sys.path.insert(0, p)
+for _path_item in (str(ROOT), str(BACKEND_DIR)):
+    if _path_item not in sys.path:
+        sys.path.insert(0, _path_item)
 
-import devcentral_bridge
-import oracle
+from backend import devcentral_bridge  # pylint: disable=wrong-import-position
+from backend import oracle  # pylint: disable=wrong-import-position
 
 
-class handler(BaseHTTPRequestHandler):
+class handler(BaseHTTPRequestHandler):  # pylint: disable=invalid-name
+    """Vercel Serverless HTTP Request Handler para o Cloud Mirror e APK Mobile do SOTC."""
+
     def send_data(self, data, kind="application/json; charset=utf-8", status=200):
+        """Envia resposta HTTP com cabeçalhos de segurança e controle de cache."""
         self.send_response(status)
         self.send_header("Content-Type", kind)
         self.send_header("Cache-Control", "no-store")
@@ -29,21 +32,32 @@ class handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(data)
 
-    def do_GET(self):
+    def do_GET(self):  # pylint: disable=invalid-name
+        """Processa requisições GET de interface, assets, APK e telemetria Neon."""
         path = urlparse(self.path).path
+        assets_dir = ROOT / "frontend" / "assets"
+        apk_type = "application/vnd.android.package-archive"
         try:
             if path in ("/", "/index.html"):
-                self.send_data((ROOT / "frontend" / "index.html").read_bytes(), "text/html; charset=utf-8")
+                html_bytes = (ROOT / "frontend" / "index.html").read_bytes()
+                self.send_data(html_bytes, "text/html; charset=utf-8")
             elif path == "/gothic.css":
-                self.send_data((ROOT / "frontend" / "gothic.css").read_bytes(), "text/css; charset=utf-8")
+                css_bytes = (ROOT / "frontend" / "gothic.css").read_bytes()
+                self.send_data(css_bytes, "text/css; charset=utf-8")
             elif path == "/background.jpg":
-                self.send_data((ROOT / "frontend" / "assets" / "background.jpg").read_bytes(), "image/jpeg")
+                bg_bytes = (assets_dir / "background.jpg").read_bytes()
+                self.send_data(bg_bytes, "image/jpeg")
             elif path == "/logo.png":
-                self.send_data((ROOT / "frontend" / "assets" / "logo.png").read_bytes(), "image/png")
+                logo_bytes = (assets_dir / "logo.png").read_bytes()
+                self.send_data(logo_bytes, "image/png")
             elif path == "/sotc.ico":
-                self.send_data((ROOT / "frontend" / "assets" / "sotc.ico").read_bytes(), "image/x-icon")
-            elif path == "/SingOfTheCross.apk":
-                self.send_data((ROOT / "frontend" / "assets" / "SingOfTheCross.apk").read_bytes(), "application/vnd.android.package-archive")
+                ico_bytes = (assets_dir / "sotc.ico").read_bytes()
+                self.send_data(ico_bytes, "image/x-icon")
+            elif path in ("/SingOfTheCross.apk", "/SOTC-Monitor-v1.0.0.apk"):
+                apk_file = assets_dir / "SOTC-Monitor-v1.0.0.apk"
+                if not apk_file.exists():
+                    apk_file = assets_dir / "SingOfTheCross.apk"
+                self.send_data(apk_file.read_bytes(), apk_type)
             elif path == "/api/status":
                 rows = devcentral_bridge.fetch_vm_snapshots_from_neon()
                 self.send_data(json.dumps(rows, ensure_ascii=False).encode("utf-8"))
@@ -56,7 +70,11 @@ class handler(BaseHTTPRequestHandler):
             elif path == "/api/devcentral":
                 data = devcentral_bridge.fetch_overview()
                 self.send_data(json.dumps(data, ensure_ascii=False).encode("utf-8"))
-            elif path in ("/api/sentinel/heartbeat", "/api/sentinel/alerts", "/api/sentinel/telemetry"):
+            elif path in (
+                "/api/sentinel/heartbeat",
+                "/api/sentinel/alerts",
+                "/api/sentinel/telemetry",
+            ):
                 data = devcentral_bridge.fetch_sentinel_status()
                 self.send_data(json.dumps(data, ensure_ascii=False).encode("utf-8"))
             elif path == "/api/oracle":
@@ -65,36 +83,45 @@ class handler(BaseHTTPRequestHandler):
                 self.send_data(json.dumps(data, ensure_ascii=False).encode("utf-8"))
             elif path == "/api/command-center":
                 rows = devcentral_bridge.fetch_vm_snapshots_from_neon()
-                try: dc_ov = devcentral_bridge.fetch_overview()
-                except Exception: dc_ov = {}
-                try: sent_st = devcentral_bridge.fetch_sentinel_status()
-                except Exception: sent_st = {}
-                try: aud = devcentral_bridge.fetch_audit_from_neon(50)
-                except Exception: aud = []
+                try:
+                    dc_ov = devcentral_bridge.fetch_overview()
+                except (ValueError, OSError, RuntimeError):
+                    dc_ov = {}
+                try:
+                    sent_st = devcentral_bridge.fetch_sentinel_status()
+                except (ValueError, OSError, RuntimeError):
+                    sent_st = {}
+                try:
+                    aud = devcentral_bridge.fetch_audit_from_neon(50)
+                except (ValueError, OSError, RuntimeError):
+                    aud = []
                 suite = oracle.build_command_center_suite(rows, dc_ov, sent_st, aud)
                 self.send_data(json.dumps(suite, ensure_ascii=False).encode("utf-8"))
             elif path == "/api/aliases":
                 self.send_data(b'["radar-producao"]')
             else:
                 self.send_error(404)
-        except Exception as e:
-            self.send_data(json.dumps({"error": str(e)}).encode("utf-8"), status=500)
+        except (ValueError, KeyError, TypeError, OSError, RuntimeError) as exc:
+            err_payload = json.dumps({"error": str(exc)}).encode("utf-8")
+            self.send_data(err_payload, status=500)
 
-    def do_POST(self):
+    def do_POST(self):  # pylint: disable=invalid-name
+        """Processa verificações HTTP de saúde e bloqueia intervenções SSH no Cloud Mirror."""
         path = urlparse(self.path).path
         try:
-            n = int(self.headers.get("Content-Length", "0"))
-            item = json.loads(self.rfile.read(n)) if n > 0 else {}
+            content_len = int(self.headers.get("Content-Length", "0"))
+            raw_body = self.rfile.read(content_len) if content_len > 0 else b"{}"
+            item = json.loads(raw_body)
             if path == "/api/devcentral/health":
                 res = devcentral_bridge.check_http_health(item.get("url", ""))
                 self.send_data(json.dumps(res, ensure_ascii=False).encode("utf-8"))
                 return
-            self.send_data(
-                json.dumps({
-                    "ok": False,
-                    "error": "Modo Cloud Mirror (Vercel): Intervenções SSH/Power são exclusivas do Cockpit Local no Windows 11 (127.0.0.1:8765)."
-                }, ensure_ascii=False).encode("utf-8"),
-                status=403,
+            msg = (
+                "Modo Cloud Mirror / Mobile: Intervenções diretas de energia/SSH "
+                "exigem confirmação no Cockpit Local Windows 11 (127.0.0.1:8765)."
             )
-        except Exception as e:
-            self.send_data(json.dumps({"error": str(e)}).encode("utf-8"), status=400)
+            err_resp = json.dumps({"ok": False, "error": msg}, ensure_ascii=False)
+            self.send_data(err_resp.encode("utf-8"), status=403)
+        except (ValueError, KeyError, TypeError, OSError) as exc:
+            err_payload = json.dumps({"error": str(exc)}).encode("utf-8")
+            self.send_data(err_payload, status=400)

@@ -319,7 +319,92 @@
 
     @media (max-width: 920px) {
       .split { grid-template-columns: 1fr; }
-      h1 { font-size: 24px; }
+      h1 { font-size: 22px; }
+    }
+    /* ==========================================================================
+       RESPONSIVIDADE MOBILE-FIRST (ANDROID APK & CELULAR • ZERO OVERFLOW HORIZONTAL)
+       ========================================================================== */
+    html, body {
+      max-width: 100vw;
+      overflow-x: hidden;
+    }
+    .mobile-bottom-nav {
+      display: none;
+    }
+    @media (max-width: 768px) {
+      header {
+        padding: 12px 14px;
+        gap: 12px;
+      }
+      header img {
+        width: 58px;
+        height: 68px;
+      }
+      main {
+        padding: 12px 10px 84px;
+      }
+      nav {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding: 8px 10px;
+        -webkit-overflow-scrolling: touch;
+      }
+      nav a {
+        flex-shrink: 0;
+        font-size: 12px;
+        padding: 7px 10px;
+      }
+      .cockpit-shell, .panel {
+        padding: 12px;
+      }
+      .hud-telemetry-strip {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .cockpit-gauges-6 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .vm-visual-cards, .quick-grid, .dep-graph {
+        grid-template-columns: 1fr;
+      }
+      .suite-tabs {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 8px;
+      }
+      .suite-tab-btn {
+        flex-shrink: 0;
+      }
+      .mobile-bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 58px;
+        background: rgba(14, 11, 16, 0.98);
+        border-top: 2px solid #8b0000;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        z-index: 90;
+        box-shadow: 0 -6px 24px #000;
+      }
+      .mobile-bottom-nav a {
+        color: #e8e4db;
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-family: Georgia, serif;
+        border-right: 1px solid #2b1d23;
+      }
+      .mobile-bottom-nav a:hover, .mobile-bottom-nav a:active {
+        background: rgba(139, 0, 0, 0.3);
+        color: var(--gold);
+      }
+      body.sotc-mobile-apk .mobile-bottom-nav {
+        display: none; /* O APK já renderiza a barra nativa Material Design 3 */
+      }
     }
     :root { color-scheme: dark; --blood: #8b0000; --bone: #e8e4db; --silver: #a8a9ad; --gold: #b59b61; }
     h1, h2 { font-family: Georgia, serif; font-variant: small-caps; letter-spacing: 1.5px; text-shadow: 0 2px 8px #000; }
@@ -377,7 +462,7 @@
       <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer">
         <input id="auto" type="checkbox" checked> Varredura automática (15s)
       </label>
-      <a class="action" href="/SingOfTheCross.apk" download="SingOfTheCross.apk" style="border-color:var(--gold);color:var(--gold)">📱 Baixar App Android (.APK)</a>
+      <a class="action" href="/SOTC-Monitor-v1.0.0.apk" download="SOTC-Monitor-v1.0.0.apk" style="border-color:var(--gold);color:var(--gold)">📱 Baixar APK (SOTC-Monitor-v1.0.0.apk)</a>
       <span id="status" class="muted" role="status">Iniciando radares e telemetria…</span>
     </div>
 
@@ -902,9 +987,17 @@
     </dialog>
 
     <footer>
-      <strong>Sing Of The Cross (SOTC)</strong> — Central Facilitadora de Monitoramento e Intervenção em Máquinas Virtuais.<br>
-      No seu Windows 11, você pode abrir pelo programa <code>SingOfTheCross.exe</code> (na sua Área de Trabalho). Pela internet ou celular, acesse <code>https://cloud-vm-monitor.vercel.app</code>.
+      <strong>Sing Of The Cross (SOTC Monitor v1.0.0)</strong> — Central Facilitadora Multi-Cloud (Web, Windows 11 <code>SingOfTheCross.exe</code> &amp; Android <code>SOTC-Monitor-v1.0.0.apk</code> • Package <code>br.com.sotc.monitor</code>).<br>
+      Acesse pela nuvem ou celular em <code>https://cloud-vm-monitor.vercel.app</code>.
     </footer>
+
+    <!-- Barra de Navegação Inferior Mobile-First (Início, VMs, Alertas, Menu) -->
+    <div class="mobile-bottom-nav" aria-label="Navegação Mobile">
+      <a href="#cockpit"><span>🎛️</span><span>Início</span></a>
+      <a href="#visao-geral"><span>🖥️</span><span>VMs</span></a>
+      <a href="#sentinel"><span>🚨</span><span>Alertas</span></a>
+      <a href="#sotc-suite"><span>🏛️</span><span>Menu SOTC</span></a>
+    </div>
   </main>
 
   <script>
@@ -1039,6 +1132,10 @@
           let sevText = a.severity === 'CRITICAL' ? '🔴 Crítico' : '🟡 Atenção';
           let sevBadge = el('span', sevText, 'badge-pill ' + (a.severity === 'CRITICAL' ? 'bad' : 'warn'));
           cellrow($('sentinelAlertsTable'), [new Date((a.ts || 0) * 1000).toLocaleTimeString(), a.vm_ssh, a.metric, a.value, sevBadge, a.message]);
+        }
+        if (window.SotcAndroid && al.length && !window._sotcPushNotified) {
+          window._sotcPushNotified = true;
+          try { window.SotcAndroid.notifyAlert('Alerta SOTC Sentinel (' + al[0].vm_ssh + ')', al[0].message); } catch (e) {}
         }
       }
     }

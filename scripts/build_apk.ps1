@@ -46,12 +46,14 @@ $unalignedApk = Join-Path $build "unaligned.apk"
 Write-Host "[2/6] Recursos e AndroidManifest.xml vinculados via AAPT2."
 
 # 3. Compilar classes Java (R.java + MainActivity.java) com JDK 21 (target Java 8 bytecode para D8)
+$oldPkgDir = Join-Path $mobile "src\com"
+if (Test-Path $oldPkgDir) { Remove-Item $oldPkgDir -Recurse -Force }
 $javaFiles = @(
-    (Join-Path $build "gen\com\sotc\commandcenter\R.java"),
-    (Join-Path $mobile "src\com\sotc\commandcenter\MainActivity.java")
+    (Join-Path $build "gen\br\com\sotc\monitor\R.java"),
+    (Join-Path $mobile "src\br\com\sotc\monitor\MainActivity.java")
 )
 & $javac -source 1.8 -target 1.8 -encoding UTF-8 -cp $androidJar -d "$build\obj" $javaFiles
-Write-Host "[3/6] Codigo Java compilado com OpenJDK 21."
+Write-Host "[3/6] Codigo Java (br.com.sotc.monitor) compilado com OpenJDK 21."
 
 # 4. Converter .class para classes.dex usando D8
 $classFiles = Get-ChildItem -Path "$build\obj" -Recurse -Filter "*.class" | ForEach-Object { $_.FullName }
@@ -71,16 +73,22 @@ if (-not (Test-Path $keystore)) {
     & $keytool -genkeypair -v -keystore $keystore -alias sotckey -keyalg RSA -keysize 2048 -validity 10000 -storepass sotc123456 -keypass sotc123456 -dname "CN=Sing Of The Cross, OU=Multi-Cloud Command Center, O=SOTC, L=Curitiba, ST=PR, C=BR"
 }
 
+$finalApkNamed = Join-Path $root "SOTC-Monitor-v1.0.0.apk"
 $finalApkRoot = Join-Path $root "SingOfTheCross.apk"
+$finalApkAssetsNamed = Join-Path $root "frontend\assets\SOTC-Monitor-v1.0.0.apk"
 $finalApkAssets = Join-Path $root "frontend\assets\SingOfTheCross.apk"
+$finalApkDesktopNamed = "C:\Users\vinad\Desktop\SOTC-Monitor-v1.0.0.apk"
 $finalApkDesktop = "C:\Users\vinad\Desktop\SingOfTheCross.apk"
 
-& $apksigner sign --ks $keystore --ks-key-alias sotckey --ks-pass pass:sotc123456 --key-pass pass:sotc123456 --out $finalApkRoot $alignedApk
-& $apksigner verify --verbose $finalApkRoot
+& $apksigner sign --ks $keystore --ks-key-alias sotckey --ks-pass pass:sotc123456 --key-pass pass:sotc123456 --out $finalApkNamed $alignedApk
+& $apksigner verify --verbose $finalApkNamed
 
-Copy-Item -Path $finalApkRoot -Destination $finalApkAssets -Force
-Copy-Item -Path $finalApkRoot -Destination $finalApkDesktop -Force
+Copy-Item -Path $finalApkNamed -Destination $finalApkRoot -Force
+Copy-Item -Path $finalApkNamed -Destination $finalApkAssetsNamed -Force
+Copy-Item -Path $finalApkNamed -Destination $finalApkAssets -Force
+Copy-Item -Path $finalApkNamed -Destination $finalApkDesktopNamed -Force
+Copy-Item -Path $finalApkNamed -Destination $finalApkDesktop -Force
 Remove-Item $build -Recurse -Force
 
-Write-Host "[6/6] APK ASSINADO E VERIFICADO COM SUCESSO!"
-Get-Item $finalApkRoot, $finalApkDesktop | Select-Object FullName, Length, LastWriteTime
+Write-Host "[6/6] APK SOTC-Monitor-v1.0.0.apk (br.com.sotc.monitor) ASSINADO E VERIFICADO COM SUCESSO!"
+Get-Item $finalApkNamed, $finalApkDesktopNamed | Select-Object FullName, Length, LastWriteTime

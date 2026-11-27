@@ -1,0 +1,19 @@
+{
+  "name": "sotc-monitor",
+  "version": "1.0.0",
+  "description": "Sing Of The Cross (SOTC Monitor) - Multi-Cloud Command Center & Android APK",
+  "private": true,
+  "scripts": {
+    "start": "python app.py",
+    "build:apk": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build_apk.ps1",
+    "cap:sync": "npx cap sync android",
+    "cap:open": "npx cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/core": "^6.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.0.0"
+  }
+}
