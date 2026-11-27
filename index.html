@@ -1,192 +1,1023 @@
-<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SOTC | V0.7 The Sentinel &amp; The Convergence</title><style>
-*{box-sizing:border-box}body{margin:0;color:#e8e4db;background:linear-gradient(90deg,#09090bed,#09090bd9),url('/background.jpg') center/cover fixed;font:14px system-ui}header{display:flex;align-items:center;gap:20px;padding:16px 4%;border-bottom:1px solid #84232d;background:#0b090ce8}header img{width:85px;height:100px;object-fit:contain}h1,h2{font-family:Georgia,serif;margin:0 0 8px}h1{font-size:32px;letter-spacing:2px}small,.muted{color:#a9a5ab}main{max-width:1480px;margin:auto;padding:24px}section{margin:20px 0}button,select,input,a{font:inherit}.panel{background:linear-gradient(145deg,#1b181eee,#0f1014f5);border:1px solid #44333c;border-top:2px solid #8b1827;border-radius:9px;padding:18px;box-shadow:0 8px 28px #0006}.big{font-size:28px;font-weight:700;margin-top:4px}.rings{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:18px;text-align:center}.ring{width:146px;height:146px;margin:10px auto;position:relative}.ring svg{width:100%;height:100%;transform:rotate(-90deg)}.ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:24px}.split{display:grid;grid-template-columns:1.85fr 1.15fr;gap:18px}.line{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:10px 0;border-bottom:1px solid #352b32}.ok{color:#73db9c}.bad{color:#ff8585}.warn{color:#e3bd76}.scroll{overflow:auto;max-height:420px}canvas{width:100%;height:230px}footer{color:#aaa;margin:24px 0;line-height:1.6}@media(max-width:920px){.split{grid-template-columns:1fr}h1{font-size:24px}}
-:root{color-scheme:dark;--blood:#8b0000;--bone:#e8e4db;--silver:#a8a9ad;--gold:#b59b61}h1,h2{font-family:Georgia,serif;font-variant:small-caps;letter-spacing:1.5px;text-shadow:0 2px 8px #000}h2:before{content:'✠ ';color:var(--gold)}*{scrollbar-color:#78313e #100d11}dialog{max-width:480px;width:90%;background:#171117;color:var(--bone);border:3px double #a64b59;box-shadow:0 0 40px #000;padding:24px}dialog::backdrop{background:#000c}dialog input{width:100%;margin:12px 0}</style><link rel="stylesheet" href="/gothic.css"><div class="mist" aria-hidden="true"></div><canvas id="ashCanvas" style="position:fixed;inset:0;pointer-events:none;z-index:-1;width:100%;height:100%" aria-hidden="true"></canvas><header><img src="/logo.png" alt="Logo SOTC"><div><small>SOTC / MULTI-CLOUD &amp; DEVOPS COMMAND CENTER</small><h1>Sing Of The Cross</h1><small>V1.0 — THE THRONE (SENTINEL · ORACLE · ABYSS · CONVERGENCE) · DARK GOTHIC CINEMATIC</small></div></header><nav aria-label="Módulos"><a href="#stats">✠ The Cathedral</a><a href="#sentinel">👁 The Sentinel</a><a href="#watcher">◉ The Watcher</a><a href="#oracle">🔮 The Oracle</a><a href="#abyss">🕳 The Abyss</a><a href="#guardian">◆ The Guardian</a><a href="#reaper">⚔ The Reaper</a><a href="#grimoire">📜 The Grimoire (DevCentral)</a><a href="#crypt">✦ The Crypt</a></nav><main><div class="toolbar"><button id="refresh">Consultar agora</button><select id="cloud"><option value="">Todas as clouds</option><option>Google Cloud</option><option>AWS</option><option>Azure</option><option>Oracle Cloud</option></select><label style="display:inline-flex;align-items:center;gap:6px"><input id="auto" type="checkbox" checked> Atualização 30 s</label><span id="status" class="muted" role="status">Aguardando consulta</span></div><section class="grid" id="stats"></section><section class="panel" id="sentinel"><h2>THE SENTINEL • Monitoramento contínuo &amp; Agente Windows 11</h2><p class="muted" style="margin-bottom:14px">Coleta independente do navegador a cada 30 segundos via <code>agent/sentinel.py</code>, persistida no banco Neon PostgreSQL com avaliação automática de limites.</p><div class="grid" id="sentinelKpis" style="margin-bottom:16px"></div><div class="split"><div class="panel"><h2>Alertas ativos (Sentinel Engine)</h2><div class="scroll" style="max-height:240px"><table><thead><tr><th>Horário</th><th>VM</th><th>Métrica</th><th>Valor</th><th>Severidade</th><th>Diagnóstico</th></tr></thead><tbody id="sentinelAlertsTable"></tbody></table></div></div><div class="panel"><h2>Limites oficiais de alerta</h2><div class="line"><span class="muted">CPU / RAM / Disco</span><strong>75% Atenção · 90% Crítico</strong></div><div class="line"><span class="muted">Latência SSH</span><strong>150 ms Atenção · 500 ms Crítico</strong></div><div class="line"><span class="muted">Heartbeat do Agente</span><strong>90 s Atenção · 180 s Crítico</strong></div><div class="line"><span class="muted">Falhas SSH consecutivas</span><strong>2 Atenção · 3 Crítico</strong></div></div></div></section><section class="panel"><h2>Inventário de infraestrutura</h2><div class="toolbar" style="margin-bottom:12px"><button id="discover">Descobrir aliases SSH</button><select id="alias"><option value="">Selecione</option></select><select id="provider"><option>Google Cloud</option><option>AWS</option><option>Azure</option><option>Oracle Cloud</option></select><button id="add">Cadastrar</button><small id="importStatus"></small></div><div class="scroll"><table><thead><tr><th>VM</th><th>Cloud</th><th>SSH</th><th>Latência SSH</th><th>Indício VS Code</th><th>CPU</th><th>RAM</th><th>Disco</th></tr></thead><tbody id="inventory"></tbody></table></div></section><section class="split" id="watcher"><div class="panel"><h2>Telemetria da máquina</h2><select id="selected" aria-label="Máquina selecionada" style="width:100%;margin-bottom:10px"></select><div class="rings" id="rings"></div><h2 style="margin-top:16px">Histórico de utilização</h2><div class="toolbar" style="margin-bottom:10px"><select id="range"><option value="3600">Última hora</option><option value="86400">24 horas</option><option value="604800">7 dias</option></select><button id="export">Exportar CSV</button><small class="muted">CPU • RAM • Disco (%)</small></div><canvas id="chart" aria-label="Histórico de CPU, RAM e disco"></canvas><small id="historyNote" class="muted"></small></div><div class="panel"><h2>Central de intervenção</h2><div id="details"></div><div class="toolbar" id="actions" style="margin:14px 0"></div><p class="muted">Diagnósticos somente leitura. Intervenções avançadas disponíveis nas seções Guardian e Reaper abaixo.</p><h2 style="margin-top:16px">Alertas da consulta</h2><div id="alerts"></div></div></section><section class="panel" id="oracle"><h2>THE ORACLE • Análise inteligente &amp; FinOps Multi-Cloud</h2><p class="muted" style="margin-bottom:14px">Correlação automática entre saúde da infraestrutura, consumo de disco/logs e estimativa de custos mensais.</p><div class="grid" id="oracleKpis" style="margin-bottom:16px"></div><div id="oracleInsights"></div></section><section class="panel" id="abyss"><h2>THE ABYSS • Diagnóstico profundo de disco (86%) &amp; Runbooks</h2><p class="muted" style="margin-bottom:12px">Inspeção detalhada de diretórios <code>/var/log</code>, <code>journald</code>, cache APT, containers e limpeza preventiva com confirmação Guardian.</p><div class="toolbar" id="abyssButtons" style="margin-bottom:12px"></div><pre id="abyssOutput" role="status">Clique em "Raio-X de Espaço em Disco (86%)" para inspecionar o uso de /var/log e systemd journal na VM selecionada.</pre></section><section class="panel" id="guardian"><h2>GUARDIAN • Diagnóstico e intervenção</h2><p class="muted" style="margin-bottom:12px">Usa a VM selecionada na telemetria. Consultas sob demanda, sem armazenar credenciais.</p><div class="toolbar" id="guardianButtons" style="margin-bottom:12px"></div><div class="toolbar" style="margin-bottom:12px"><label style="display:inline-flex;align-items:center;gap:8px">Unidade systemd <input id="service" placeholder="exemplo.service"></label><button id="restartService">Reiniciar serviço (confirmar)</button></div><pre id="guardianOutput" role="status">Selecione uma operação.</pre><h2 style="margin-top:16px">Auditoria de intervenções</h2><div id="audit" class="scroll" style="max-height:200px"></div></section><section class="panel" id="reaper"><h2>THE REAPER • Comando e controle</h2><p class="muted" style="margin-bottom:12px">Operações na VM selecionada. O terminal interativo abre uma janela OpenSSH do Windows; o console abaixo executa diagnósticos predefinidos, não comandos arbitrários.</p><div class="toolbar" id="reaperButtons" style="margin-bottom:12px"></div><pre id="reaperOutput" role="status">Selecione um diagnóstico.</pre><h2 style="margin-top:16px">Energia da infraestrutura</h2><p class="warn" style="margin-bottom:12px">Bloqueada por padrão. Habilitação por VM no inventário local (allow_power). Reiniciar no GCP executa reset forçado; parar Azure desaloca a VM. Verifique impactos e backups.</p><div class="toolbar" id="powerButtons"></div></section><section class="panel" id="grimoire"><h2>THE GRIMOIRE • DevCentral Convergence (Neon PostgreSQL)</h2><p class="muted" style="margin-bottom:14px">Integração direta com o banco Neon do DevCentral (GitHub, GitLab, 2 Contas Vercel e vínculo com VMs). Funciona mesmo com o DevCentral fechado.</p><div class="toolbar" style="margin-bottom:16px"><button id="loadDevCentral">Sincronizar Catálogo Neon</button><select id="dcFilterSource"><option value="">Todas as fontes</option><option value="GitHub">GitHub</option><option value="GitLab">GitLab</option><option value="vercel1">Vercel: viniciuscasagrande-creator</option><option value="vercel2">Vercel: DEVELOPDISKINGRESSOS-9897</option><option value="vm">Vinculados à VM radar-producao</option><option value="local">Com Pasta Local no Windows 11</option></select><input id="dcSearch" placeholder="Filtrar projeto, stack ou URL..." style="min-width:240px;flex:1;max-width:340px"><a class="action" href="https://devcentral-190fe.web.app" target="_blank" rel="noopener noreferrer">Abrir DevCentral Web</a><span id="dcStatus" class="muted"></span></div><div class="grid" id="dcStats" style="margin-bottom:18px"></div><div class="scroll" style="max-height:520px"><table class="grimoire-table"><thead><tr><th>Projeto</th><th>Fonte / Stack</th><th>Vínculo VM / Local</th><th>Deploys (Vercel 1 &amp; 2)</th><th>Saúde HTTP</th><th>Ações VS Code</th></tr></thead><tbody id="dcTable"></tbody></table></div></section><section class="panel" id="crypt"><h2>THE CRYPT • Histórico de verificações</h2><div class="scroll"><table><thead><tr><th>Data / hora</th><th>SSH</th><th>Latência</th><th>CPU</th><th>RAM</th><th>Disco</th></tr></thead><tbody id="events"></tbody></table></div></section><dialog id="powerDialog"><h2>Protocolo Reaper</h2><p>Operação de energia pode interromper serviços. Confira o alvo e digite:</p><strong id="powerExpected"></strong><input id="powerTyped" autocomplete="off" aria-label="Confirmação de energia"><div class="toolbar"><button id="powerCancel">Cancelar</button><button class="danger" id="powerAccept" disabled>Autorizar</button></div></dialog><footer>Histórico persistente no Neon PostgreSQL + SQLite local (30 dias). O Sentinel Agent Windows 11 executa coletas contínuas a cada 30 segundos mesmo com o navegador fechado. Indícios de processos não confirmam sessão ativa do editor. Falha SSH não significa VM desligada.</footer></main><dialog id="guardianConfirm"><h2>Protocolo Guardian</h2><p>Reiniciar um serviço pode interromper a produção.</p><p>Digite exatamente: <strong id="expected"></strong></p><input id="typed" autocomplete="off" aria-label="Confirmação"><div class="toolbar"><button id="cancelConfirm">Cancelar</button><button id="acceptConfirm" disabled>Autorizar reinício</button></div></dialog><script>
-const $=id=>document.getElementById(id);let data=[],hist=[],sentinelData=null,busy=false;const el=(tag,txt,cls)=>{let e=document.createElement(tag);if(txt!=null)e.textContent=txt;if(cls)e.className=cls;return e};const pct=v=>v==null?'—':v+'%';const disk=x=>x.disk_pct?x.disk_pct:'—';const lat=x=>x.latency_ms!=null?x.latency_ms+' ms':'—';const ssh=x=>x.ssh_status==='ok'?'Acessível':'Não confirmado';const evidence=x=>x.local_evidence==='detected'?'Detectado':x.local_evidence==='not_detected'?'Não detectado':'Desconhecido';const chosen=()=>data.find(x=>x.ssh===$('selected').value);const filtered=()=>data.filter(x=>!$('cloud').value||x.cloud===$('cloud').value);function line(k,v){let d=el('div',null,'line');d.append(el('span',k,'muted'),el('strong',v));return d}function cellrow(target,values){let t=el('tr');for(let v of values){let c=el('td');if(v instanceof Node)c.append(v);else c.textContent=v;t.append(c)}target.append(t)}function ring(label,v){let d=el('div');let r=el('div',null,'ring');let n=Number(v),valid=v!=null&&Number.isFinite(n);let ns='http://www.w3.org/2000/svg',s=document.createElementNS(ns,'svg');s.setAttribute('viewBox','0 0 120 120');for(let [color,amount] of [['#332b33',100],[valid&&n>=90?'#f17b7b':valid&&n>=75?'#e0ad64':'#a9394b',valid?Math.min(100,Math.max(0,n)):0]]){let c=document.createElementNS(ns,'circle');for(let [k,val] of Object.entries({cx:60,cy:60,r:51,fill:'none',stroke:color,'stroke-width':10,'stroke-dasharray':`${amount*3.2044} 320.44`,'stroke-linecap':'round'}))c.setAttribute(k,val);s.append(c)}r.append(s,el('b',valid?pct(n):'—'));d.append(r,el('strong',label));return d}
-function renderSentinel(){
-  if(!sentinelData)return;
-  let ag=(sentinelData.agents||[])[0];
-  let al=sentinelData.alerts||[];
-  $('sentinelKpis').replaceChildren();
-  let stLabel=ag?ag.comm_state:'AGUARDANDO AGENTE';
-  let ageLabel=ag?(ag.age_seconds<60?'Há '+ag.age_seconds+' s':'Há '+Math.round(ag.age_seconds/60)+' min'):'—';
-  for(let [k,v] of [['Sentinel Agent Win11',stLabel],['Host do Agente',ag?ag.hostname:'Windows 11'],['Último Heartbeat',ageLabel],['Alertas Registrados',al.length]]){
-    let p=el('div',null,'panel');p.append(el('small',k),el('div',v,'big'));$('sentinelKpis').append(p);
-  }
-  $('sentinelAlertsTable').replaceChildren();
-  if(!al.length){
-    cellrow($('sentinelAlertsTable'),['—','—','—','—','OK','Nenhum alerta ativo.']);
-  }else{
-    for(let a of al.slice(0,15)){
-      let sevBadge=el('span',a.severity,'badge-pill '+(a.severity==='CRITICAL'?'bad':'warn'));
-      cellrow($('sentinelAlertsTable'),[new Date((a.ts||0)*1000).toLocaleTimeString(),a.vm_ssh,a.metric,a.value,sevBadge,a.message]);
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Sing Of The Cross • Central Simplificada de Máquinas Virtuais e Projetos</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: #e8e4db;
+      background: linear-gradient(90deg, #09090bed, #09090bd9), url('/background.jpg') center/cover fixed;
+      font: 14px system-ui, -apple-system, 'Segoe UI', sans-serif;
     }
-  }
-}
-function render(){let rows=filtered(),prev=$('selected').value;$('stats').replaceChildren();for(let [k,n] of [['VMs monitoradas',rows.length],['SSH acessível',rows.filter(x=>x.ssh_status==='ok').length],['Indícios VS Code',rows.filter(x=>x.local_evidence==='detected').length],['SSH não confirmado',rows.filter(x=>x.ssh_status!=='ok').length]]){let p=el('div',null,'panel');p.append(el('small',k),el('div',n,'big'));$('stats').append(p)}$('selected').replaceChildren(...rows.map(x=>new Option(x.name,x.ssh)));if(rows.some(x=>x.ssh===prev))$('selected').value=prev;$('inventory').replaceChildren();for(let x of rows){let b=el('button',x.name,'btn-table');b.onclick=()=>{$('selected').value=x.ssh;detail()};cellrow($('inventory'),[b,x.cloud,ssh(x),lat(x),evidence(x),pct(x.cpu_pct),pct(x.ram_pct),disk(x)])}detail()}function samples(){let x=chosen();return hist.filter(r=>x&&r.ssh===x.ssh&&r.ts>=Date.now()/1000-Number($('range').value)).sort((a,b)=>a.ts-b.ts)}function detail(){let x=chosen();for(let id of ['rings','details','alerts','actions','events'])$(id).replaceChildren();if(!x){$('details').append(el('p','Nenhuma VM selecionada'));draw();return}let dp=x.disk_pct?parseFloat(x.disk_pct):null;for(let [l,v] of [['CPU',x.cpu_pct],['Memória RAM',x.ram_pct],['Disco raiz',dp]])$('rings').append(ring(l,v));for(let [k,v] of [['VM',x.name],['Cloud',x.cloud],['Hostname',x.hostname||'—'],['Zona',x.zone||'—'],['SSH',ssh(x)],['Latência SSH',lat(x)],['VS Code Server',x.server_status==='present'?'Detectado':x.server_status==='not_detected'?'Não detectado':'Desconhecido'],['Processo local VS Code',evidence(x)],['Sessão ativa','Não confirmada'],['vCPUs',x.cores||'—'],['Carga média 1 min',x.load||'—'],['Uptime',x.uptime? (Number(x.uptime)/3600).toFixed(1)+' h':'—'],['Última verificação',x.checked||'—']])$('details').append(line(k,v));let a=el('a','Abrir VS Code','action');a.href='vscode://vscode-remote/ssh-remote+'+encodeURIComponent(x.ssh)+(x.folder||'/');$('actions').append(a);if(x.cloud==='Google Cloud'&&x.project&&x.zone){let c=el('a','Console GCP','action');c.href='https://console.cloud.google.com/compute/instancesDetail/zones/'+encodeURIComponent(x.zone)+'/instances/'+encodeURIComponent(x.name)+'?project='+encodeURIComponent(x.project);c.target='_blank';c.rel='noopener noreferrer';$('actions').append(c)}let copy=el('button','Copiar comando SSH');copy.onclick=async()=>{try{await navigator.clipboard.writeText('ssh '+x.ssh);copy.textContent='Copiado'}catch{copy.textContent='Não foi possível copiar'}};$('actions').append(copy);let alerts=[];if(x.ssh_status!=='ok')alerts.push('SSH não confirmado: '+(x.detail||''));for(let [name,v] of [['CPU',x.cpu_pct],['RAM',x.ram_pct],['Disco',dp]])if(v>=75)alerts.push(name+' '+v+'% — '+(v>=90?'crítico':'atenção'));if(x.latency_ms>=150)alerts.push('Latência SSH '+x.latency_ms+' ms — '+(x.latency_ms>=500?'crítico':'atenção'));$('alerts').append(...(alerts.length?alerts.map(t=>el('p',t,'warn')):[el('p','Nenhum limite excedido nos dados disponíveis.','muted')]));for(let r of samples().slice(-100).reverse())cellrow($('events'),[new Date(r.ts*1000).toLocaleString(),ssh(r),lat(r),pct(r.cpu_pct),pct(r.ram_pct),disk(r)]);draw()}function draw(){let c=$('chart'),w=c.clientWidth||600,h=230,dpr=devicePixelRatio||1;c.width=w*dpr;c.height=h*dpr;let g=c.getContext('2d');g.scale(dpr,dpr);let rows=samples();g.font='11px system-ui';for(let n=0;n<=100;n+=25){let y=10+(100-n)*1.8;g.fillStyle='#aaa';g.fillText(n+'%',0,y+4);g.strokeStyle='#352b32';g.beginPath();g.moveTo(40,y);g.lineTo(w-10,y);g.stroke()}for(let [key,color] of [['cpu_pct','#ed6b77'],['ram_pct','#d9b66d'],['disk_pct','#89b9d9']]){g.strokeStyle=color;g.fillStyle=color;g.lineWidth=2;let last=null;let start=rows[0]?.ts||0,end=rows.at(-1)?.ts||start;for(let r of rows){let v=r[key]==null?NaN:parseFloat(r[key]);if(!Number.isFinite(v)){last=null;continue}let x=40+(w-50)*(end===start?.5:(r.ts-start)/(end-start)),y=10+(100-v)*1.8;if(last){g.beginPath();g.moveTo(...last);g.lineTo(x,y);g.stroke()}g.beginPath();g.arc(x,y,2.5,0,Math.PI*2);g.fill();last=[x,y]}}$('historyNote').textContent=rows.length+' amostras no período · '+(rows.length?new Date(rows[0].ts*1000).toLocaleString()+' até '+new Date(rows.at(-1).ts*1000).toLocaleString():'sem histórico disponível')}async function req(url,opts){let r=await fetch(url,opts),v=await r.json();if(!r.ok)throw Error(v.error||'Falha');return v}async function refresh(){if(busy)return;busy=true;$('refresh').disabled=true;$('status').textContent='Consultando…';try{let [st,hi,se]=await Promise.all([req('/api/status'),req('/api/history'),req('/api/sentinel/heartbeat').catch(()=>null)]);data=st;hist=hi;if(se){sentinelData=se;renderSentinel()}render();$('status').textContent='Consulta: '+new Date().toLocaleTimeString()}catch(e){$('status').textContent='Falha: '+e.message+' · dados anteriores, se houver'}finally{busy=false;$('refresh').disabled=false}}$('refresh').onclick=refresh;$('cloud').onchange=render;$('selected').onchange=detail;$('range').onchange=detail;window.onresize=draw;$('discover').onclick=async()=>{try{let a=await req('/api/aliases');$('alias').replaceChildren(new Option('Selecione',''),...a.map(x=>new Option(x,x)));$('importStatus').textContent=a.length+' aliases'}catch(e){$('importStatus').textContent=e.message}};$('add').onclick=async()=>{try{await req('/api/inventory',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ssh:$('alias').value,cloud:$('provider').value})});$('importStatus').textContent='Cadastrada';refresh()}catch(e){$('importStatus').textContent=e.message}};$('export').onclick=()=>{let csv=['timestamp,ssh_status,latency_ms,cpu_pct,ram_pct,disk_pct',...samples().map(r=>[new Date(r.ts*1000).toISOString(),r.ssh_status,r.latency_ms??'',r.cpu_pct??'',r.ram_pct??'',parseFloat(r.disk_pct)||''].join(','))].join('\n');let url=URL.createObjectURL(new Blob([csv],{type:'text/csv'})),a=el('a');a.href=url;a.download='sotc-history.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};setInterval(()=>{if($('auto').checked)refresh()},30000);refresh();
-let guardianBusy=false;
-async function audit(){try{let rows=await req('/api/guardian/events');$('audit').replaceChildren(...rows.map(r=>el('p',new Date(r.ts*1000).toLocaleString()+' · '+r.alias+' · '+r.action+' · '+(r.ok?'OK':'Falha'))))}catch(e){$('audit').textContent=e.message}}
-async function guardian(action,extra={}){let x=chosen();if(!x||guardianBusy)return;guardianBusy=true;$('guardianOutput').textContent='Consultando '+x.ssh+'…';try{let r=await req('/api/guardian',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ssh:x.ssh,action,...extra})});$('guardianOutput').textContent=x.ssh+' · '+(r.ok?'OK':'Falha')+'\n'+r.output}catch(e){$('guardianOutput').textContent=e.message}finally{guardianBusy=false;audit()}}
-for(let [id,label] of [['cloud','Estado real na cloud'],['processes','Processos / CPU'],['services','Serviços ativos'],['network','Rede'],['storage','Armazenamento'],['logs','Logs de alerta'],['system','Sistema']]){let b=el('button',label);b.onclick=()=>guardian(id);$('guardianButtons').append(b)}
-$('restartService').onclick=()=>{let x=chosen(),service=$('service').value.trim();if(!x||!service)return;let expected=x.ssh+' '+service;$('expected').textContent=expected;$('typed').value='';$('acceptConfirm').disabled=true;$('typed').oninput=()=>{$('acceptConfirm').disabled=$('typed').value!==expected};$('cancelConfirm').onclick=()=>$('guardianConfirm').close();$('acceptConfirm').onclick=()=>{if($('typed').value!==expected||chosen()?.ssh!==x.ssh)return;$('guardianConfirm').close();guardian('restart_service',{service,confirm:expected})};$('guardianConfirm').showModal()};audit();
-
-let reaperBusy=false;
-async function reaper(action,extra={},target=chosen()){if(!target||reaperBusy)return;reaperBusy=true;$('reaperOutput').textContent=target.ssh+' · Executando…';try{let r=await req('/api/reaper',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ssh:target.ssh,action,...extra})});$('reaperOutput').textContent=target.ssh+' · '+(r.ok?'OK':'Falha')+'\n'+r.output}catch(e){$('reaperOutput').textContent=target.ssh+' · '+e.message+' (em caso de timeout, consulte o estado antes de repetir)'}finally{reaperBusy=false;audit()}}
-for(let [id,label] of [['terminal','Abrir terminal SSH'],['identity','Identidade'],['process_tree','Processos / PID'],['listeners','Portas abertas'],['memory','RAM e swap'],['failed_services','Serviços com falha'],['filesystems','Discos e inodes'],['sessions','Sessões Linux']]){let b=el('button',label);b.onclick=()=>reaper(id);$('reaperButtons').append(b)}
-for(let [action,label] of [['start','Ligar VM'],['stop','Parar VM'],['reboot','Reiniciar VM']]){let b=el('button',label,'danger');b.onclick=()=>{let target=chosen();if(!target)return;if(target.allow_power!==true){$('reaperOutput').textContent='Energia bloqueada para '+target.ssh;return}let expected=target.ssh+' '+action;$('powerExpected').textContent=expected;$('powerTyped').value='';$('powerAccept').disabled=true;$('powerTyped').oninput=()=>{$('powerAccept').disabled=$('powerTyped').value!==expected};$('powerCancel').onclick=()=>$('powerDialog').close();$('powerAccept').onclick=()=>{if($('powerTyped').value!==expected||chosen()?.ssh!==target.ssh)return;$('powerDialog').close();reaper(action,{confirm:expected},target)};$('powerDialog').showModal()};$('powerButtons').append(b)}
-
-let dcData=null;
-function renderDevCentral(){
-  if(!dcData)return;
-  let s=dcData.summary||{};
-  $('dcStats').replaceChildren();
-  for(let [k,v] of [['Projetos Neon',s.total||0],['GitHub / GitLab',(s.github||0)+' / '+(s.gitlab||0)],['Deploys Ativos',s.with_deploy||0],['Vínculo radar-producao',s.linked_to_vm||0],['Pastas Locais Win11',s.local_found||0]]){
-    let p=el('div',null,'panel');p.append(el('small',k),el('div',v,'big'));$('dcStats').append(p);
-  }
-  let q=($('dcSearch').value||'').toLowerCase(),f=$('dcFilterSource').value;
-  let rows=(dcData.projects||[]).filter(p=>{
-    if(f==='GitHub'&&p.source!=='GitHub')return false;
-    if(f==='GitLab'&&p.source!=='GitLab')return false;
-    if(f==='vercel1'&&!(p.vercel_accounts||[]).includes(s.account1_name))return false;
-    if(f==='vercel2'&&!(p.vercel_accounts||[]).includes(s.account2_name))return false;
-    if(f==='vm'&&!p.vm_link)return false;
-    if(f==='local'&&!p.local_path)return false;
-    if(q&&!(`${p.name} ${p.description} ${p.tech} ${p.deploy_url}`).toLowerCase().includes(q))return false;
-    return true;
-  });
-  $('dcTable').replaceChildren();
-  for(let p of rows){
-    let nameBox=el('div');
-    nameBox.append(el('span',(p.is_pinned?'✠ ':'')+p.name,'proj-title'),el('div',p.description||'Sem descrição cadastrada.','proj-desc'));
-
-    let srcBox=el('div',null,'cell-stack');
-    srcBox.append(el('strong',p.source+' · '+p.tech),el('small','Branch: '+(p.branch||'main'),'muted'));
-
-    let linkBox=el('div',null,'cell-stack');
-    if(p.vm_link)linkBox.append(el('span','● VM: '+p.vm_link.vm_name,'badge-pill ok'));
-    if(p.local_path){
-      let folderName=p.local_path.split(/[\\/]/).pop()||p.local_path;
-      let locBadge=el('span','📁 '+folderName,'badge-pill');
-      locBadge.title=p.local_path;
-      linkBox.append(locBadge);
+    header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 16px 4%;
+      border-bottom: 1px solid #84232d;
+      background: #0b090ce8;
     }
-    if(!p.vm_link&&!p.local_path)linkBox.append(el('span','Somente Nuvem','muted'));
+    header img { width: 88px; height: 104px; object-fit: contain; }
+    h1, h2, h3 { font-family: Georgia, serif; margin: 0 0 8px; }
+    h1 { font-size: 32px; letter-spacing: 2px; }
+    small, .muted { color: #b5b0b8; }
+    main { max-width: 1480px; margin: auto; padding: 24px; }
+    section { margin: 22px 0; }
+    button, select, input, a { font: inherit; }
+    .panel {
+      background: linear-gradient(145deg, #1b181eee, #0f1014f5);
+      border: 1px solid #44333c;
+      border-top: 2px solid #8b1827;
+      border-radius: 9px;
+      padding: 18px;
+      box-shadow: 0 8px 28px #0006;
+    }
+    .big { font-size: 28px; font-weight: 700; margin-top: 4px; }
+    .rings {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+      gap: 18px;
+      text-align: center;
+      margin: 14px 0;
+    }
+    .ring { width: 146px; height: 146px; margin: 10px auto; position: relative; }
+    .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .ring b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 24px; }
+    .split { display: grid; grid-template-columns: 1.4fr 1fr; gap: 18px; }
+    .line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 10px 0;
+      border-bottom: 1px solid #352b32;
+    }
+    .ok { color: #73db9c; }
+    .bad { color: #ff8585; }
+    .warn { color: #e3bd76; }
+    .scroll { overflow: auto; max-height: 440px; }
+    canvas#chart { width: 100%; height: 220px; }
+    footer { color: #aaa; margin: 24px 0; line-height: 1.6; }
 
-    let depBox=el('div',null,'cell-stack');
-    if(p.deploy_url){
-      let hostLabel=p.deploy_url.replace(/^https?:\/\//,'').replace(/\/$/,'');
-      if(hostLabel.length>30)hostLabel=hostLabel.slice(0,28)+'…';
-      let a=el('a','↗ '+hostLabel,'action btn-table');
-      a.href=p.deploy_url;a.target='_blank';a.rel='noopener noreferrer';a.title=p.deploy_url;
-      depBox.append(a);
+    /* Cartões Didáticos de Ações Rápidas (Sem precisar entrar na VM) */
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+      margin: 14px 0;
     }
-    if(p.vercel_accounts&&p.vercel_accounts.length){
-      depBox.append(el('small',p.vercel_accounts.join(' • '),'muted'));
+    .quick-card {
+      background: rgba(16, 13, 18, 0.9);
+      border: 1px solid #573640;
+      border-left: 3px solid #b59b61;
+      padding: 14px 16px;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
     }
-    if(!p.deploy_url&&(!p.vercel_accounts||!p.vercel_accounts.length)){
-      depBox.append(el('span','—','muted'));
+    .quick-card.crit { border-left-color: #b91c1c; }
+    .quick-card h3 { font-size: 15px; color: #e8e4db; margin: 0; }
+    .quick-card p { font-size: 12.5px; color: #b5b0b8; margin: 0; line-height: 1.45; }
+
+    /* Cartão Visual da VM estilo VM Manager */
+    .vm-visual-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 16px;
+      margin: 16px 0;
+    }
+    .vm-box {
+      background: rgba(18, 14, 19, 0.95);
+      border: 2px solid #6e444e;
+      padding: 18px;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .vm-box-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #3c2930;
+      padding-bottom: 10px;
+    }
+    .vm-box-title { font-size: 19px; font-weight: 700; font-family: Georgia, serif; }
+    .vm-bars { display: flex; flex-direction: column; gap: 8px; }
+    .vm-bar-row { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; }
+    .vm-bar-top { display: flex; justify-content: space-between; }
+    .vm-bar-track { height: 8px; background: #261d23; border-radius: 4px; overflow: hidden; }
+    .vm-bar-fill { height: 100%; background: linear-gradient(90deg, #8b0000, #d94848); }
+
+    @media (max-width: 920px) {
+      .split { grid-template-columns: 1fr; }
+      h1 { font-size: 24px; }
+    }
+    :root { color-scheme: dark; --blood: #8b0000; --bone: #e8e4db; --silver: #a8a9ad; --gold: #b59b61; }
+    h1, h2 { font-family: Georgia, serif; font-variant: small-caps; letter-spacing: 1.5px; text-shadow: 0 2px 8px #000; }
+    h2:before { content: '✠ '; color: var(--gold); }
+    * { scrollbar-color: #78313e #100d11; }
+    dialog {
+      max-width: 500px;
+      width: 92%;
+      background: #171117;
+      color: var(--bone);
+      border: 3px double #a64b59;
+      box-shadow: 0 0 40px #000;
+      padding: 24px;
+    }
+    dialog::backdrop { background: #000c; }
+    dialog input { width: 100%; margin: 12px 0; }
+  </style>
+  <link rel="stylesheet" href="/gothic.css">
+</head>
+<body>
+  <div class="mist" aria-hidden="true"></div>
+  <canvas id="ashCanvas" style="position:fixed;inset:0;pointer-events:none;z-index:-1;width:100%;height:100%" aria-hidden="true"></canvas>
+
+  <header>
+    <img src="/logo.png" alt="Logo Sing Of The Cross">
+    <div>
+      <small>CENTRAL FACILITADORA DE MÁQUINAS VIRTUAIS E PROJETOS</small>
+      <h1>Sing Of The Cross</h1>
+      <small>MONITORE E RESOLVA TUDO COM 1 CLIQUE — SEM PRECISAR ENTRAR NA VM</small>
+    </div>
+  </header>
+
+  <nav aria-label="Menu Principal em Português">
+    <a href="#visao-geral">✠ 1. Minhas Máquinas (VMs)</a>
+    <a href="#acoes-rapidas">⚡ 2. Intervenção Rápida (1 Clique)</a>
+    <a href="#watcher">◉ 3. Medidores e Gráficos</a>
+    <a href="#oracle">🧠 4. Diagnóstico Explicado</a>
+    <a href="#grimoire">📂 5. Meus Projetos (DevCentral)</a>
+    <a href="#sentinel">👁 6. Monitor Automático 24h</a>
+    <a href="#crypt">📜 7. Histórico</a>
+  </nav>
+
+  <main>
+    <!-- Barra de Controle Simplificada -->
+    <div class="toolbar">
+      <button id="refresh">🔄 Atualizar Dados Agora</button>
+      <select id="cloud" aria-label="Filtrar por Provedor de Nuvem">
+        <option value="">Todas as Nuvens (Google, AWS, Azure, Oracle)</option>
+        <option value="Google Cloud">Google Cloud</option>
+        <option value="AWS">Amazon AWS</option>
+        <option value="Azure">Microsoft Azure</option>
+        <option value="Oracle Cloud">Oracle Cloud</option>
+      </select>
+      <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer">
+        <input id="auto" type="checkbox" checked> Atualizar sozinho a cada 30 segundos
+      </label>
+      <span id="status" class="muted" role="status">Carregando informações das máquinas…</span>
+    </div>
+
+    <!-- 1. Resumo Geral Didático -->
+    <section id="visao-geral">
+      <div class="grid" id="stats" style="margin-bottom: 18px;"></div>
+
+      <!-- Cartões Visuais das VMs (Estilo Controlador Visual Didático) -->
+      <div class="panel">
+        <h2>Painel de Controle Rápido das Máquinas Virtuais</h2>
+        <p class="muted" style="margin-bottom:12px">
+          Veja o estado de cada servidor de forma simples. Use os botões de cada máquina para abrir no VS Code, ver diagnósticos ou gerenciar a energia sem digitar comandos.
+        </p>
+        <div class="vm-visual-cards" id="vmVisualCards"></div>
+
+        <!-- Cadastro Fácil de Nova VM -->
+        <details style="margin-top:14px;border-top:1px solid #3c2930;padding-top:12px">
+          <summary style="cursor:pointer;color:var(--gold);font-weight:600">➕ Quer adicionar outra máquina virtual do seu computador? Clique aqui</summary>
+          <div class="toolbar" style="margin-top:12px">
+            <button id="discover">🔍 Buscar Máquinas Configuradas no Windows (SSH)</button>
+            <select id="alias"><option value="">Escolha a máquina encontrada</option></select>
+            <select id="provider">
+              <option value="Google Cloud">Google Cloud</option>
+              <option value="AWS">AWS</option>
+              <option value="Azure">Azure</option>
+              <option value="Oracle Cloud">Oracle Cloud</option>
+            </select>
+            <button id="add">✅ Salvar Máquina no Painel</button>
+            <small id="importStatus"></small>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- 2. CENTRAL FACILITADORA: Ações Rápidas Sem Precisar Entrar na VM -->
+    <section class="panel" id="acoes-rapidas">
+      <h2>⚡ Central Facilitadora — Intervenções Sem Precisar Acessar a VM</h2>
+      <p class="muted" style="margin-bottom:14px">
+        Escolha abaixo o que você deseja verificar ou resolver na máquina selecionada (<strong id="activeVmLabel" style="color:var(--gold)">radar-producao</strong>). O resultado aparece na caixa preta logo abaixo em poucos segundos:
+      </p>
+
+      <div class="quick-grid">
+        <div class="quick-card">
+          <div>
+            <h3>🔍 1. Por que o Disco está em 86%?</h3>
+            <p>Mostra exatamente quais pastas, logs antigos e arquivos temporários estão ocupando espaço na máquina.</p>
+          </div>
+          <button onclick="runAbyss('disk_hotspots')">Ver O Que Ocupa o Disco</button>
+        </div>
+
+        <div class="quick-card crit">
+          <div>
+            <h3>🧹 2. Limpar Logs e Liberar Espaço</h3>
+            <p>Remove logs antigos do sistema (&gt;100 MB) e cache de pacotes do Linux com segurança, sem parar o site.</p>
+          </div>
+          <button class="danger" id="btnCleanDisk">Limpar Espaço Agora (Seguro)</button>
+        </div>
+
+        <div class="quick-card">
+          <div>
+            <h3>⚙️ 3. O Que Está Gastando Memória e CPU?</h3>
+            <p>Lista os programas que estão rodando dentro da máquina agora, do mais pesado para o mais leve.</p>
+          </div>
+          <button onclick="guardian('processes')">Ver Programas em Execução</button>
+        </div>
+
+        <div class="quick-card">
+          <div>
+            <h3>🩺 4. Algum Serviço Travou ou Caiu?</h3>
+            <p>Verifica automaticamente se todos os serviços do Linux (como servidor web e banco) estão funcionando sem falhas.</p>
+          </div>
+          <button onclick="reaper('failed_services')">Verificar Serviços com Problema</button>
+        </div>
+
+        <div class="quick-card">
+          <div>
+            <h3>☁️ 5. Confirmar Status na Google Cloud</h3>
+            <p>Consulta diretamente o sistema da Google Cloud para confirmar se a máquina está ligada (RUNNING).</p>
+          </div>
+          <button onclick="guardian('cloud')">Consultar Status Oficial na Nuvem</button>
+        </div>
+
+        <div class="quick-card">
+          <div>
+            <h3>📋 6. Ver Últimos Avisos e Erros</h3>
+            <p>Traz as últimas mensagens importantes do sistema caso você esteja investigando alguma lentidão ou erro.</p>
+          </div>
+          <button onclick="guardian('logs')">Ler Últimos Avisos da Máquina</button>
+        </div>
+
+        <div class="quick-card">
+          <div>
+            <h3>🌐 7. Ver Portas e Conexões de Rede</h3>
+            <p>Mostra quais portas de internet estão abertas e quantas conexões a máquina está atendendo.</p>
+          </div>
+          <button onclick="reaper('listeners')">Ver Portas Abertas</button>
+        </div>
+
+        <div class="quick-card">
+          <div>
+            <h3>💻 8. Abrir Terminal ou VS Code</h3>
+            <p>Caso queira mexer no código ou abrir a tela preta do SSH diretamente no seu Windows 11.</p>
+          </div>
+          <div class="toolbar">
+            <button onclick="reaper('terminal')" style="flex:1">Abrir SSH</button>
+            <a id="quickVsCodeBtn" class="action" href="vscode://vscode-remote/ssh-remote+radar-producao/" style="flex:1">Abrir VS Code</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resultado Claro da Ação Escolhida -->
+      <div style="margin-top:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <strong style="color:var(--gold)">📺 Tela de Resultado da Ação (Sem precisar entrar na VM):</strong>
+          <small class="muted">Tudo o que a máquina responder aparece aqui abaixo</small>
+        </div>
+        <pre id="unifiedOutput" role="status" style="min-height:140px;border-left:4px solid var(--gold)">Clique em qualquer um dos botões acima para consultar ou resolver um problema na máquina virtual.</pre>
+      </div>
+
+      <!-- Reinício de Serviço Específico e Controle de Energia -->
+      <details style="margin-top:16px;border-top:1px solid #3c2930;padding-top:12px">
+        <summary style="cursor:pointer;color:var(--gold);font-weight:600">🛠️ Opções Avançadas: Reiniciar um Serviço Específico ou Ligar/Desligar a Máquina Inteira</summary>
+        <div class="split" style="margin-top:14px">
+          <div class="panel">
+            <h3>Reiniciar um Serviço do Linux (Ex: caddy.service)</h3>
+            <p class="muted" style="margin-bottom:10px">Pede confirmação digitada para evitar reinícios por engano na produção.</p>
+            <div class="toolbar">
+              <input id="service" placeholder="Ex: caddy.service ou ssh.service" style="flex:1">
+              <button id="restartService" class="danger">🔄 Reiniciar Serviço</button>
+            </div>
+          </div>
+          <div class="panel">
+            <h3>Energia da Máquina Virtual (Ligar / Desligar / Reiniciar)</h3>
+            <p class="muted" style="margin-bottom:10px">Por segurança, o desligamento vem travado por padrão na máquina de produção.</p>
+            <div class="toolbar" id="powerButtons"></div>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- 3. Diagnóstico Explicado em Linguagem Simples (The Oracle) -->
+    <section class="panel" id="oracle">
+      <h2>🧠 Diagnóstico Explicado &amp; Custo Estimado da Nuvem</h2>
+      <p class="muted" style="margin-bottom:14px">
+        O sistema analisa os números da sua máquina e traduz em recomendações práticas em Português:
+      </p>
+      <div class="grid" id="oracleKpis" style="margin-bottom:16px"></div>
+      <div id="oracleInsights"></div>
+    </section>
+
+    <!-- 4. Medidores Circulares e Histórico (The Watcher) -->
+    <section class="split" id="watcher">
+      <div class="panel">
+        <h2>◉ Medidores de Saúde em Tempo Real</h2>
+        <div class="toolbar" style="margin-bottom:10px">
+          <label for="selected" class="muted">Máquina analisada:</label>
+          <select id="selected" aria-label="Máquina selecionada" style="flex:1"></select>
+        </div>
+        <div class="rings" id="rings"></div>
+
+        <h2 style="margin-top:18px">Gráfico de Uso ao Longo do Tempo</h2>
+        <div class="toolbar" style="margin-bottom:10px">
+          <select id="range">
+            <option value="3600">Última 1 hora</option>
+            <option value="86400">Últimas 24 horas</option>
+            <option value="604800">Últimos 7 dias</option>
+          </select>
+          <button id="export">📥 Baixar Planilha (CSV)</button>
+          <small class="muted">Vermelho: Processador (CPU) • Dourado: Memória RAM • Azul: Disco</small>
+        </div>
+        <canvas id="chart" aria-label="Gráfico histórico de CPU, RAM e disco"></canvas>
+        <small id="historyNote" class="muted"></small>
+      </div>
+
+      <div class="panel">
+        <h2>Ficha Técnica da Máquina</h2>
+        <div id="details"></div>
+        <div class="toolbar" id="actions" style="margin:14px 0"></div>
+        <h2 style="margin-top:16px">Avisos Automáticos de Atenção</h2>
+        <div id="alerts"></div>
+      </div>
+    </section>
+
+    <!-- 5. Meus Projetos (DevCentral / The Grimoire) -->
+    <section class="panel" id="grimoire">
+      <h2>📂 Meus Projetos &amp; Sistemas (Conectado ao DevCentral)</h2>
+      <p class="muted" style="margin-bottom:14px">
+        Todos os seus 42 projetos do GitHub, GitLab e das suas 2 contas da Vercel aparecem aqui. Você pode testar se o site está online com 1 clique ou abrir o projeto direto no seu VS Code!
+      </p>
+      <div class="toolbar" style="margin-bottom:16px">
+        <button id="loadDevCentral">🔄 Atualizar Lista de Projetos</button>
+        <select id="dcFilterSource">
+          <option value="">Mostrar todos os 42 projetos</option>
+          <option value="vm">🔗 Projetos ligados à VM radar-producao</option>
+          <option value="local">💻 Projetos com Pasta no meu Windows 11</option>
+          <option value="GitHub">Repositórios do GitHub</option>
+          <option value="GitLab">Repositórios do GitLab</option>
+          <option value="vercel1">Publicados na Vercel 1 (viniciuscasagrande-creator)</option>
+          <option value="vercel2">Publicados na Vercel 2 (DEVELOPDISKINGRESSOS-9897)</option>
+        </select>
+        <input id="dcSearch" placeholder="Digite o nome do projeto para buscar..." style="min-width:240px;flex:1;max-width:360px">
+        <a class="action" href="https://devcentral-190fe.web.app" target="_blank" rel="noopener noreferrer">🌐 Abrir Painel DevCentral Completo</a>
+        <span id="dcStatus" class="muted"></span>
+      </div>
+      <div class="grid" id="dcStats" style="margin-bottom:18px"></div>
+      <div class="scroll" style="max-height:520px">
+        <table class="grimoire-table">
+          <thead>
+            <tr>
+              <th>Nome do Projeto e Descrição</th>
+              <th>Onde está o Código</th>
+              <th>Servidor / Pasta Local</th>
+              <th>Site Publicado (Deploy)</th>
+              <th>Testar Site</th>
+              <th>Abrir Agora</th>
+            </tr>
+          </thead>
+          <tbody id="dcTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 6. Monitoramento Automático 24h (The Sentinel) -->
+    <section class="panel" id="sentinel">
+      <h2>👁 Monitor Automático em Segundo Plano (Windows 11 → Nuvem)</h2>
+      <p class="muted" style="margin-bottom:14px">
+        Mostra o status do robô local que vigia suas máquinas a cada 30 segundos e atualiza o banco de dados na nuvem automaticamente.
+      </p>
+      <div class="grid" id="sentinelKpis" style="margin-bottom:16px"></div>
+      <div class="split">
+        <div class="panel">
+          <h2>Últimos Alertas Registrados pelo Robô</h2>
+          <div class="scroll" style="max-height:220px">
+            <table>
+              <thead>
+                <tr><th>Hora</th><th>Máquina</th><th>Item</th><th>Valor</th><th>Nível</th><th>Explicação</th></tr>
+              </thead>
+              <tbody id="sentinelAlertsTable"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="panel">
+          <h2>Quando o Sistema Avisa Você?</h2>
+          <div class="line"><span class="muted">Processador (CPU), Memória ou Disco</span><strong>Acima de 75% (Atenção) · 90% (Crítico)</strong></div>
+          <div class="line"><span class="muted">Demora na resposta do SSH</span><strong>Acima de 150 ms (Atenção) · 500 ms (Crítico)</strong></div>
+          <div class="line"><span class="muted">Máquina sem responder ao SSH</span><strong>2 tentativas seguidas</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. Histórico e Auditoria (The Crypt) -->
+    <section class="split" id="crypt">
+      <div class="panel">
+        <h2>📜 Histórico das Últimas Consultas</h2>
+        <div class="scroll" style="max-height:260px">
+          <table>
+            <thead>
+              <tr><th>Data / Hora</th><th>Conexão SSH</th><th>Tempo Resposta</th><th>CPU</th><th>Memória</th><th>Disco</th></tr>
+            </thead>
+            <tbody id="events"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>🛡️ Registro de Ações Executadas por Você</h2>
+        <div id="audit" class="scroll" style="max-height:260px"></div>
+      </div>
+    </section>
+
+    <!-- Modais de Confirmação de Segurança em Português -->
+    <dialog id="powerDialog">
+      <h2>⚠️ Confirmar Ação de Energia</h2>
+      <p>Desligar ou reiniciar a máquina virtual vai interromper os sistemas que estão rodando nela.</p>
+      <p>Para confirmar que deseja fazer isso, digite abaixo:</p>
+      <strong id="powerExpected" style="color:var(--gold)"></strong>
+      <input id="powerTyped" autocomplete="off" aria-label="Confirmação de energia">
+      <div class="toolbar">
+        <button id="powerCancel">Cancelar</button>
+        <button class="danger" id="powerAccept" disabled>Confirmar e Executar</button>
+      </div>
+    </dialog>
+
+    <dialog id="guardianConfirm">
+      <h2>⚠️ Confirmar Reinício de Serviço</h2>
+      <p>Reiniciar um serviço pode causar uma rápida pausa na aplicação em produção.</p>
+      <p>Para autorizar, digite exatamente: <strong id="expected" style="color:var(--gold)"></strong></p>
+      <input id="typed" autocomplete="off" aria-label="Confirmação">
+      <div class="toolbar">
+        <button id="cancelConfirm">Cancelar</button>
+        <button id="acceptConfirm" class="danger" disabled>Autorizar Reinício</button>
+      </div>
+    </dialog>
+
+    <footer>
+      <strong>Sing Of The Cross (SOTC)</strong> — Central Facilitadora de Monitoramento e Intervenção em Máquinas Virtuais.<br>
+      No seu Windows 11, você pode abrir pelo programa <code>SingOfTheCross.exe</code> (na sua Área de Trabalho). Pela internet ou celular, acesse <code>https://cloud-vm-monitor.vercel.app</code>.
+    </footer>
+  </main>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    let data = [], hist = [], sentinelData = null, busy = false;
+    const el = (tag, txt, cls) => { let e = document.createElement(tag); if (txt != null) e.textContent = txt; if (cls) e.className = cls; return e; };
+    const pct = v => v == null ? '—' : v + '%';
+    const disk = x => x.disk_pct ? x.disk_pct : '—';
+    const lat = x => x.latency_ms != null ? x.latency_ms + ' ms' : '—';
+    const ssh = x => x.ssh_status === 'ok' ? '🟢 Conectada e Acessível' : '🔴 Sem Resposta';
+    const evidence = x => x.local_evidence === 'detected' ? '🟢 Aberto neste PC' : x.local_evidence === 'not_detected' ? '⚪ Fechado neste PC' : 'Não verificado';
+    const chosen = () => data.find(x => x.ssh === $('selected').value) || data[0];
+    const filtered = () => data.filter(x => !$('cloud').value || x.cloud === $('cloud').value);
+
+    function line(k, v) {
+      let d = el('div', null, 'line');
+      d.append(el('span', k, 'muted'), el('strong', v));
+      return d;
     }
 
-    let healthBox=el('div');
-    if(p.deploy_url){
-      let hb=el('button','Testar HTTP','btn-table');
-      hb.onclick=async()=>{
-        hb.disabled=true;hb.textContent='Testando…';
-        try{
-          let res=await req('/api/devcentral/health',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:p.deploy_url})});
-          hb.textContent=(res.ok?'● HTTP ':'▲ HTTP ')+res.status+' ('+res.latency_ms+'ms)';
-          hb.className='btn-table '+(res.ok?'ok':'warn');
-        }catch(e){hb.textContent='✕ Falha';hb.className='btn-table bad'}finally{hb.disabled=false}
+    function cellrow(target, values) {
+      let t = el('tr');
+      for (let v of values) {
+        let c = el('td');
+        if (v instanceof Node) c.append(v);
+        else c.textContent = v;
+        t.append(c);
+      }
+      target.append(t);
+    }
+
+    function statusWord(v) {
+      let n = Number(v);
+      if (!Number.isFinite(n)) return 'Sem leitura';
+      if (n >= 90) return '🔴 Crítico (Muito Alto)';
+      if (n >= 75) return '🟡 Atenção (Acima de 75%)';
+      if (n >= 50) return '🟢 Uso Moderado';
+      return '🟢 Tranquilo / Leve';
+    }
+
+    function ring(label, v, explainText) {
+      let d = el('div');
+      let r = el('div', null, 'ring');
+      let n = Number(v), valid = v != null && Number.isFinite(n);
+      let ns = 'http://www.w3.org/2000/svg', s = document.createElementNS(ns, 'svg');
+      s.setAttribute('viewBox', '0 0 120 120');
+      for (let [color, amount] of [['#332b33', 100], [valid && n >= 90 ? '#f17b7b' : valid && n >= 75 ? '#e0ad64' : '#a9394b', valid ? Math.min(100, Math.max(0, n)) : 0]]) {
+        let c = document.createElementNS(ns, 'circle');
+        for (let [k, val] of Object.entries({ cx: 60, cy: 60, r: 51, fill: 'none', stroke: color, 'stroke-width': 10, 'stroke-dasharray': `${amount * 3.2044} 320.44`, 'stroke-linecap': 'round' })) c.setAttribute(k, val);
+        s.append(c);
+      }
+      r.append(s, el('b', valid ? pct(n) : '—'));
+      d.append(r, el('strong', label), el('div', valid ? statusWord(n) : '—', 'muted'), el('small', explainText || '', 'muted'));
+      return d;
+    }
+
+    function renderVmCards(rows) {
+      const box = $('vmVisualCards');
+      box.replaceChildren();
+      if (!rows.length) {
+        box.append(el('p', 'Nenhuma máquina virtual encontrada neste filtro.', 'muted'));
+        return;
+      }
+      for (const x of rows) {
+        const card = el('div', null, 'vm-box');
+        const head = el('div', null, 'vm-box-header');
+        const left = el('div');
+        left.append(el('div', x.name.toUpperCase(), 'vm-box-title'), el('small', `${x.cloud} • Zona: ${x.zone || 'Padrão'} • ${x.cores || '2'} vCPUs`, 'muted'));
+        const badge = el('span', x.ssh_status === 'ok' ? '🟢 ONLINE / PRONTA' : '🔴 SEM ACESSO', 'badge-pill ' + (x.ssh_status === 'ok' ? 'ok' : 'bad'));
+        head.append(left, badge);
+        card.append(head);
+
+        const dp = x.disk_pct ? parseFloat(x.disk_pct) : 0;
+        const cpu = x.cpu_pct || 0;
+        const ram = x.ram_pct || 0;
+
+        const bars = el('div', null, 'vm-bars');
+        for (const [label, val, hint] of [
+          ['Processador (CPU)', cpu, statusWord(cpu)],
+          ['Memória RAM', ram, statusWord(ram)],
+          ['Espaço em Disco', dp, dp >= 75 ? '🟡 Recomendado limpar logs antigos' : '🟢 Espaço saudável']
+        ]) {
+          const r = el('div', null, 'vm-bar-row');
+          const top = el('div', null, 'vm-bar-top');
+          top.append(el('span', `${label}: ${val}%`), el('small', hint, 'muted'));
+          const track = el('div', null, 'vm-bar-track');
+          const fill = el('div', null, 'vm-bar-fill');
+          fill.style.width = `${Math.min(100, Math.max(0, val))}%`;
+          track.append(fill);
+          r.append(top, track);
+          bars.append(r);
+        }
+        card.append(bars);
+
+        const btnRow = el('div', null, 'toolbar');
+        const btnSelect = el('button', '⚡ Intervir nesta VM', 'btn-table');
+        btnSelect.onclick = () => {
+          $('selected').value = x.ssh;
+          detail();
+          document.getElementById('acoes-rapidas').scrollIntoView({ behavior: 'smooth' });
+        };
+        const btnVs = el('a', '💻 Abrir no VS Code', 'action btn-table');
+        btnVs.href = 'vscode://vscode-remote/ssh-remote+' + encodeURIComponent(x.ssh) + (x.folder || '/');
+        const btnClean = el('button', '🧹 Diagnosticar Disco', 'btn-table');
+        btnClean.onclick = () => {
+          $('selected').value = x.ssh;
+          detail();
+          runAbyss('disk_hotspots');
+          document.getElementById('acoes-rapidas').scrollIntoView({ behavior: 'smooth' });
+        };
+        btnRow.append(btnSelect, btnVs, btnClean);
+        card.append(btnRow);
+        box.append(card);
+      }
+    }
+
+    function renderSentinel() {
+      if (!sentinelData) return;
+      let ag = (sentinelData.agents || [])[0];
+      let al = sentinelData.alerts || [];
+      $('sentinelKpis').replaceChildren();
+      let stLabel = ag ? (ag.age_seconds <= 90 ? '🟢 ATIVO E CONECTADO' : '🟡 AGUARDANDO CICLO') : 'AGUARDANDO';
+      let ageLabel = ag ? (ag.age_seconds < 60 ? 'Há ' + ag.age_seconds + ' segundos' : 'Há ' + Math.round(ag.age_seconds / 60) + ' min') : '—';
+      for (let [k, v] of [['Robô Monitor (Windows 11)', stLabel], ['Computador Principal', ag ? ag.hostname : 'Windows 11'], ['Última Sincronização', ageLabel], ['Avisos Ativos', al.length]]) {
+        let p = el('div', null, 'panel'); p.append(el('small', k), el('div', v, 'big')); $('sentinelKpis').append(p);
+      }
+      $('sentinelAlertsTable').replaceChildren();
+      if (!al.length) {
+        cellrow($('sentinelAlertsTable'), ['—', '—', '—', '—', '🟢 Tudo OK', 'Nenhum problema detectado nas máquinas.']);
+      } else {
+        for (let a of al.slice(0, 15)) {
+          let sevText = a.severity === 'CRITICAL' ? '🔴 Crítico' : '🟡 Atenção';
+          let sevBadge = el('span', sevText, 'badge-pill ' + (a.severity === 'CRITICAL' ? 'bad' : 'warn'));
+          cellrow($('sentinelAlertsTable'), [new Date((a.ts || 0) * 1000).toLocaleTimeString(), a.vm_ssh, a.metric, a.value, sevBadge, a.message]);
+        }
+      }
+    }
+
+    function render() {
+      let rows = filtered(), prev = $('selected').value;
+      $('stats').replaceChildren();
+      const onlineCount = rows.filter(x => x.ssh_status === 'ok').length;
+      const offlineCount = rows.length - onlineCount;
+      const diskWarnCount = rows.filter(x => parseFloat(x.disk_pct || 0) >= 75).length;
+
+      for (let [k, n] of [
+        ['Total de Máquinas (VMs)', rows.length],
+        ['Máquinas Ligadas / Prontas', onlineCount],
+        ['Máquinas Sem Resposta', offlineCount],
+        ['Máquinas Pedindo Limpeza', diskWarnCount]
+      ]) {
+        let p = el('div', null, 'panel');
+        p.append(el('small', k), el('div', n, 'big'));
+        $('stats').append(p);
+      }
+      $('selected').replaceChildren(...rows.map(x => new Option(x.name, x.ssh)));
+      if (rows.some(x => x.ssh === prev)) $('selected').value = prev;
+      renderVmCards(rows);
+      detail();
+    }
+
+    function samples() {
+      let x = chosen();
+      return hist.filter(r => x && r.ssh === x.ssh && r.ts >= Date.now() / 1000 - Number($('range').value)).sort((a, b) => a.ts - b.ts);
+    }
+
+    function detail() {
+      let x = chosen();
+      for (let id of ['rings', 'details', 'alerts', 'actions', 'events']) $(id).replaceChildren();
+      if (!x) { $('details').append(el('p', 'Nenhuma VM selecionada')); draw(); return; }
+      $('activeVmLabel').textContent = x.name;
+      $('quickVsCodeBtn').href = 'vscode://vscode-remote/ssh-remote+' + encodeURIComponent(x.ssh) + (x.folder || '/');
+
+      let dp = x.disk_pct ? parseFloat(x.disk_pct) : null;
+      $('rings').append(
+        ring('Processador (CPU)', x.cpu_pct, 'Velocidade de processamento'),
+        ring('Memória RAM', x.ram_pct, 'Memória temporária em uso'),
+        ring('Disco Principal', dp, 'Espaço de arquivos e logs')
+      );
+
+      for (let [k, v] of [
+        ['Nome da Máquina', x.name],
+        ['Provedor de Nuvem', x.cloud],
+        ['Região / Zona', x.zone || '—'],
+        ['Status da Conexão SSH', ssh(x)],
+        ['Tempo de Resposta (Latência)', lat(x)],
+        ['Serviço do VS Code na VM', x.server_status === 'present' ? '🟢 Instalado e Ativo' : '⚪ Em Espera (Abre ao conectar)'],
+        ['Janela do VS Code neste PC', evidence(x)],
+        ['Quantidade de Processadores', (x.cores || '2') + ' vCPUs'],
+        ['Tempo Ligada Direto (Uptime)', x.uptime ? (Number(x.uptime) / 3600).toFixed(1) + ' horas (~' + Math.round(Number(x.uptime) / 86400) + ' dias)' : '—'],
+        ['Horário da Última Leitura', x.checked || '—']
+      ]) $('details').append(line(k, v));
+
+      let a = el('a', '💻 Abrir no VS Code', 'action');
+      a.href = 'vscode://vscode-remote/ssh-remote+' + encodeURIComponent(x.ssh) + (x.folder || '/');
+      $('actions').append(a);
+      if (x.cloud === 'Google Cloud' && x.project && x.zone) {
+        let c = el('a', '☁️ Abrir Painel Google Cloud', 'action');
+        c.href = 'https://console.cloud.google.com/compute/instancesDetail/zones/' + encodeURIComponent(x.zone) + '/instances/' + encodeURIComponent(x.name) + '?project=' + encodeURIComponent(x.project);
+        c.target = '_blank'; c.rel = 'noopener noreferrer';
+        $('actions').append(c);
+      }
+      let copy = el('button', '📋 Copiar Comando SSH');
+      copy.onclick = async () => {
+        try { await navigator.clipboard.writeText('ssh ' + x.ssh); copy.textContent = '✅ Copiado!'; }
+        catch { copy.textContent = 'Erro ao copiar'; }
       };
-      healthBox.append(hb);
-    }else{healthBox.append(el('span','—','muted'))}
+      $('actions').append(copy);
 
-    let actBox=el('div',null,'actions-inline');
-    if(p.local_path){
-      let aLoc=el('a','VS Code Local','action btn-table');
-      aLoc.href='vscode://file/'+p.local_path.replace(/\\/g,'/');
-      aLoc.title='Abrir pasta local: '+p.local_path;
-      actBox.append(aLoc);
-    }
-    if(p.vm_link){
-      let aVm=el('a','SSH '+p.vm_link.vm_ssh,'action btn-table');
-      aVm.href='vscode://vscode-remote/ssh-remote+'+encodeURIComponent(p.vm_link.vm_ssh)+(p.vm_link.remote_folder||'/');
-      actBox.append(aVm);
-    }
-    if(p.repo_url){
-      let aRepo=el('a','Repo','action btn-table');
-      aRepo.href=p.repo_url;aRepo.target='_blank';aRepo.rel='noopener noreferrer';
-      actBox.append(aRepo);
-    }
-    cellrow($('dcTable'),[nameBox,srcBox,linkBox,depBox,healthBox,actBox]);
-  }
-}
-async function loadDevCentral(){
-  $('dcStatus').textContent='Consultando Neon PostgreSQL…';
-  try{
-    dcData=await req('/api/devcentral');
-    renderDevCentral();
-    $('dcStatus').textContent='Catálogo Neon carregado ('+(dcData.summary?.total||0)+' projetos)';
-  }catch(e){$('dcStatus').textContent='Erro Neon: '+e.message}
-}
-$('loadDevCentral').onclick=loadDevCentral;$('dcFilterSource').onchange=renderDevCentral;$('dcSearch').oninput=renderDevCentral;loadDevCentral();
+      let alerts = [];
+      if (x.ssh_status !== 'ok') alerts.push('🔴 A máquina não respondeu ao SSH: ' + (x.detail || ''));
+      if (dp >= 75) alerts.push(`🟡 O Disco está em ${dp}%. Recomendação: use o botão "2. Limpar Logs e Liberar Espaço" na seção de Intervenção Rápida acima.`);
+      if (x.cpu_pct >= 75) alerts.push(`🟡 O Processador (CPU) está alto (${x.cpu_pct}%).`);
+      if (x.ram_pct >= 75) alerts.push(`🟡 A Memória RAM está alta (${x.ram_pct}%).`);
+      $('alerts').append(...(alerts.length ? alerts.map(t => el('p', t, 'warn')) : [el('p', '🟢 Tudo ótimo! Nenhum limite crítico foi ultrapassado.', 'ok')]));
 
-async function loadOracle(){
-  try{
-    let o=await req('/api/oracle');
-    $('oracleKpis').replaceChildren();
-    for(let [k,v] of [['Custo Cloud Estimado (USD)','US$ '+(o.estimated_monthly_usd??0)+'/mês'],['Custo Estimado (BRL)','R$ '+(o.estimated_monthly_brl??0)+'/mês'],['Recomendações Ativas',(o.insights||[]).length],['Aplicativo Windows 11','SingOfTheCross.exe Ativo']]){
-      let p=el('div',null,'panel');p.append(el('small',k),el('div',v,'big'));$('oracleKpis').append(p);
+      for (let r of samples().slice(-100).reverse()) {
+        cellrow($('events'), [new Date(r.ts * 1000).toLocaleString(), ssh(r), lat(r), pct(r.cpu_pct), pct(r.ram_pct), disk(r)]);
+      }
+      draw();
     }
-    $('oracleInsights').replaceChildren();
-    for(let ins of (o.insights||[])){
-      let row=el('div',null,'line');
-      let left=el('div',null,'cell-stack');
-      left.append(el('strong','['+ins.category+'] '+ins.title),el('span',ins.recommendation,'muted'));
-      let badge=el('span',ins.severity,'badge-pill '+(ins.severity==='CRITICAL'?'bad':ins.severity==='WARNING'?'warn':'ok'));
-      row.append(left,badge);
-      $('oracleInsights').append(row);
-    }
-  }catch(e){}
-}
-loadOracle();
 
-let abyssBusy=false;
-async function runAbyss(action,extra={}){
-  let x=chosen();if(!x||abyssBusy)return;
-  abyssBusy=true;$('abyssOutput').textContent='Inspecionando '+x.ssh+' no The Abyss…';
-  try{
-    let r=await req('/api/abyss',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ssh:x.ssh,action,...extra})});
-    $('abyssOutput').textContent=x.ssh+' · '+(r.ok?'OK':'Falha')+'\n'+r.output;
-  }catch(e){$('abyssOutput').textContent=e.message}finally{abyssBusy=false;audit()}
-}
-for(let [id,label] of [['disk_hotspots','Raio-X de Espaço em Disco (86%)'],['critical_logs','Logs Críticos (journalctl)'],['auth_security','Segurança & Auth SSH'],['docker_containers','Containers Docker / CRI'],['top_memory','Top Processos Memória']]){
-  let b=el('button',label);b.onclick=()=>runAbyss(id);$('abyssButtons').append(b);
-}
-let vacBtn=el('button','Runbook: Limpar Journald & Cache APT','danger');
-vacBtn.onclick=()=>{
-  let x=chosen();if(!x)return;
-  let expected=x.ssh+' vacuum_journal';
-  let typed=prompt('PROTOCOLO GUARDIAN: Limpar logs antigos do journald (>100MB) e cache APT.\nPara confirmar, digite exatamente: '+expected);
-  if(typed===expected)runAbyss('vacuum_journal',{confirm:expected});
-};
-$('abyssButtons').append(vacBtn);
-
-(function initAshParticles(){
-  const cvs=$('ashCanvas');if(!cvs)return;
-  const ctx=cvs.getContext('2d');
-  let w=cvs.width=window.innerWidth,h=cvs.height=window.innerHeight;
-  window.addEventListener('resize',()=>{w=cvs.width=window.innerWidth;h=cvs.height=window.innerHeight});
-  const flakes=Array.from({length:38},()=>({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.8+0.6,vy:Math.random()*0.35+0.12,vx:(Math.random()-0.5)*0.25,c:Math.random()>0.3?'rgba(181,155,97,0.28)':'rgba(185,28,28,0.34)'}));
-  function step(){
-    ctx.clearRect(0,0,w,h);
-    for(const f of flakes){
-      f.y-=f.vy;f.x+=f.vx;
-      if(f.y<0){f.y=h;f.x=Math.random()*w}
-      if(f.x<0)f.x=w;if(f.x>w)f.x=0;
-      ctx.fillStyle=f.c;ctx.beginPath();ctx.arc(f.x,f.y,f.r,0,Math.PI*2);ctx.fill();
+    function draw() {
+      let c = $('chart'), w = c.clientWidth || 600, h = 220, dpr = devicePixelRatio || 1;
+      c.width = w * dpr; c.height = h * dpr;
+      let g = c.getContext('2d'); g.scale(dpr, dpr);
+      let rows = samples(); g.font = '11px system-ui';
+      for (let n = 0; n <= 100; n += 25) {
+        let y = 10 + (100 - n) * 1.75;
+        g.fillStyle = '#aaa'; g.fillText(n + '%', 0, y + 4);
+        g.strokeStyle = '#352b32'; g.beginPath(); g.moveTo(40, y); g.lineTo(w - 10, y); g.stroke();
+      }
+      for (let [key, color] of [['cpu_pct', '#ed6b77'], ['ram_pct', '#d9b66d'], ['disk_pct', '#89b9d9']]) {
+        g.strokeStyle = color; g.fillStyle = color; g.lineWidth = 2;
+        let last = null, start = rows[0]?.ts || 0, end = rows.at(-1)?.ts || start;
+        for (let r of rows) {
+          let v = r[key] == null ? NaN : parseFloat(r[key]);
+          if (!Number.isFinite(v)) { last = null; continue; }
+          let x = 40 + (w - 50) * (end === start ? 0.5 : (r.ts - start) / (end - start)), y = 10 + (100 - v) * 1.75;
+          if (last) { g.beginPath(); g.moveTo(...last); g.lineTo(x, y); g.stroke(); }
+          g.beginPath(); g.arc(x, y, 2.5, 0, Math.PI * 2); g.fill();
+          last = [x, y];
+        }
+      }
+      $('historyNote').textContent = rows.length + ' leituras registradas no período selecionado.';
     }
-    requestAnimationFrame(step);
-  }
-  if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches)requestAnimationFrame(step);
-})();
-</script></html>
+
+    async function req(url, opts) {
+      let r = await fetch(url, opts), v = await r.json();
+      if (!r.ok) throw Error(v.error || 'Falha na operação');
+      return v;
+    }
+
+    async function refresh() {
+      if (busy) return;
+      busy = true; $('refresh').disabled = true; $('status').textContent = '🔄 Consultando máquinas virtuais…';
+      try {
+        let [st, hi, se] = await Promise.all([
+          req('/api/status'),
+          req('/api/history'),
+          req('/api/sentinel/heartbeat').catch(() => null)
+        ]);
+        data = st; hist = hi;
+        if (se) { sentinelData = se; renderSentinel(); }
+        render();
+        $('status').textContent = '✅ Atualizado às ' + new Date().toLocaleTimeString();
+      } catch (e) {
+        $('status').textContent = '⚠️ Aviso: ' + e.message;
+      } finally {
+        busy = false; $('refresh').disabled = false;
+      }
+    }
+
+    $('refresh').onclick = refresh;
+    $('cloud').onchange = render;
+    $('selected').onchange = detail;
+    $('range').onchange = detail;
+    window.onresize = draw;
+
+    $('discover').onclick = async () => {
+      try {
+        let a = await req('/api/aliases');
+        $('alias').replaceChildren(new Option('Escolha a máquina...', ''), ...a.map(x => new Option(x, x)));
+        $('importStatus').textContent = a.length + ' máquinas encontradas no seu Windows!';
+      } catch (e) { $('importStatus').textContent = e.message; }
+    };
+
+    $('add').onclick = async () => {
+      try {
+        await req('/api/inventory', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ssh: $('alias').value, cloud: $('provider').value }) });
+        $('importStatus').textContent = '✅ Máquina cadastrada com sucesso!';
+        refresh();
+      } catch (e) { $('importStatus').textContent = e.message; }
+    };
+
+    $('export').onclick = () => {
+      let csv = ['data_hora,status_ssh,latencia_ms,cpu_pct,ram_pct,disco_pct', ...samples().map(r => [new Date(r.ts * 1000).toISOString(), r.ssh_status, r.latency_ms ?? '', r.cpu_pct ?? '', r.ram_pct ?? '', parseFloat(r.disk_pct) || ''].join(','))].join('\n');
+      let url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })), a = el('a');
+      a.href = url; a.download = 'relatorio-sotc.csv'; a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    };
+
+    setInterval(() => { if ($('auto').checked) refresh(); }, 30000);
+    refresh();
+
+    /* Funções Unificadas de Intervenção Fácil */
+    let actionBusy = false;
+    async function audit() {
+      try {
+        let rows = await req('/api/guardian/events');
+        $('audit').replaceChildren(...rows.map(r => el('p', new Date(r.ts * 1000).toLocaleString() + ' • Máquina: ' + r.alias + ' • Ação: ' + r.action + ' • ' + (r.ok ? '🟢 Sucesso' : '🔴 Falha'))));
+      } catch (e) { $('audit').textContent = e.message; }
+    }
+
+    async function guardian(action, extra = {}) {
+      let x = chosen(); if (!x || actionBusy) return;
+      actionBusy = true;
+      $('unifiedOutput').textContent = `⏳ Executando verificação (${action}) na máquina ${x.name}… aguarde alguns segundos.`;
+      try {
+        let r = await req('/api/guardian', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ssh: x.ssh, action, ...extra }) });
+        $('unifiedOutput').textContent = `✅ Resposta de ${x.name}:\n\n` + r.output;
+      } catch (e) {
+        $('unifiedOutput').textContent = '⚠️ ' + e.message;
+      } finally { actionBusy = false; audit(); }
+    }
+
+    async function reaper(action, extra = {}, target = chosen()) {
+      if (!target || actionBusy) return;
+      actionBusy = true;
+      $('unifiedOutput').textContent = `⏳ Consultando ${target.name}… aguarde alguns segundos.`;
+      try {
+        let r = await req('/api/reaper', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ssh: target.ssh, action, ...extra }) });
+        $('unifiedOutput').textContent = `✅ Resposta de ${target.name}:\n\n` + r.output;
+      } catch (e) {
+        $('unifiedOutput').textContent = '⚠️ ' + e.message;
+      } finally { actionBusy = false; audit(); }
+    }
+
+    async function runAbyss(action, extra = {}) {
+      let x = chosen(); if (!x || actionBusy) return;
+      actionBusy = true;
+      $('unifiedOutput').textContent = `⏳ Analisando disco e logs da máquina ${x.name}… aguarde alguns segundos.`;
+      try {
+        let r = await req('/api/abyss', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ssh: x.ssh, action, ...extra }) });
+        $('unifiedOutput').textContent = `✅ Diagnóstico de ${x.name}:\n\n` + r.output;
+      } catch (e) {
+        $('unifiedOutput').textContent = '⚠️ ' + e.message;
+      } finally { actionBusy = false; audit(); }
+    }
+
+    $('btnCleanDisk').onclick = () => {
+      let x = chosen(); if (!x) return;
+      let expected = x.ssh + ' vacuum_journal';
+      let typed = prompt(`LIMPEZA SEGURA DE DISCO (${x.name}):\nIsso vai apagar logs antigos do sistema (>100 MB) e cache de pacotes APT para liberar espaço em disco, sem desligar o site.\n\nPara confirmar, digite exatamente:\n${expected}`);
+      if (typed === expected) runAbyss('vacuum_journal', { confirm: expected });
+    };
+
+    $('restartService').onclick = () => {
+      let x = chosen(), service = $('service').value.trim();
+      if (!x || !service) { alert('Digite o nome do serviço (ex: caddy.service)'); return; }
+      let expected = x.ssh + ' ' + service;
+      $('expected').textContent = expected; $('typed').value = ''; $('acceptConfirm').disabled = true;
+      $('typed').oninput = () => { $('acceptConfirm').disabled = $('typed').value !== expected; };
+      $('cancelConfirm').onclick = () => $('guardianConfirm').close();
+      $('acceptConfirm').onclick = () => {
+        if ($('typed').value !== expected || chosen()?.ssh !== x.ssh) return;
+        $('guardianConfirm').close();
+        guardian('restart_service', { service, confirm: expected });
+      };
+      $('guardianConfirm').showModal();
+    };
+
+    for (let [action, label] of [['start', '🟢 Ligar Máquina'], ['stop', '🔴 Desligar Máquina'], ['reboot', '🔄 Reiniciar Máquina']]) {
+      let b = el('button', label, 'danger');
+      b.onclick = () => {
+        let target = chosen(); if (!target) return;
+        if (target.allow_power !== true) {
+          $('unifiedOutput').textContent = `🔒 Ação bloqueada por segurança na máquina ${target.name} para evitar desligamento acidental da produção. (Para destravar, adicione "allow_power": true no arquivo vms.json).`;
+          return;
+        }
+        let expected = target.ssh + ' ' + action;
+        $('powerExpected').textContent = expected; $('powerTyped').value = ''; $('powerAccept').disabled = true;
+        $('powerTyped').oninput = () => { $('powerAccept').disabled = $('powerTyped').value !== expected; };
+        $('powerCancel').onclick = () => $('powerDialog').close();
+        $('powerAccept').onclick = () => {
+          if ($('powerTyped').value !== expected || chosen()?.ssh !== target.ssh) return;
+          $('powerDialog').close();
+          reaper(action, { confirm: expected }, target);
+        };
+        $('powerDialog').showModal();
+      };
+      $('powerButtons').append(b);
+    }
+    audit();
+
+    /* Diagnóstico Explicado (The Oracle) */
+    async function loadOracle() {
+      try {
+        let o = await req('/api/oracle');
+        $('oracleKpis').replaceChildren();
+        for (let [k, v] of [
+          ['Custo Mensal Estimado (Dólar)', 'US$ ' + (o.estimated_monthly_usd ?? 0) + '/mês'],
+          ['Custo Mensal Estimado (Reais)', 'R$ ' + (o.estimated_monthly_brl ?? 0) + '/mês'],
+          ['Análises Automáticas', (o.insights || []).length + ' itens verificados'],
+          ['Programa no Windows 11', 'SingOfTheCross.exe Pronto']
+        ]) {
+          let p = el('div', null, 'panel'); p.append(el('small', k), el('div', v, 'big')); $('oracleKpis').append(p);
+        }
+        $('oracleInsights').replaceChildren();
+        for (let ins of (o.insights || [])) {
+          let row = el('div', null, 'line');
+          let left = el('div', null, 'cell-stack');
+          left.append(el('strong', '📌 [' + ins.category + '] ' + ins.title), el('span', ins.recommendation, 'muted'));
+          let cls = ins.severity === 'CRÍTICO' ? 'bad' : ins.severity === 'ATENÇÃO' ? 'warn' : 'ok';
+          let badge = el('span', ins.severity, 'badge-pill ' + cls);
+          row.append(left, badge);
+          $('oracleInsights').append(row);
+        }
+      } catch (e) {}
+    }
+    loadOracle();
+
+    /* Catálogo de Projetos (DevCentral) em Português */
+    let dcData = null;
+    function renderDevCentral() {
+      if (!dcData) return;
+      let s = dcData.summary || {};
+      $('dcStats').replaceChildren();
+      for (let [k, v] of [
+        ['Total de Projetos', s.total || 0],
+        ['GitHub / GitLab', (s.github || 0) + ' / ' + (s.gitlab || 0)],
+        ['Sites Publicados Online', s.with_deploy || 0],
+        ['Ligados à VM radar-producao', s.linked_to_vm || 0],
+        ['Pastas no seu Windows 11', s.local_found || 0]
+      ]) {
+        let p = el('div', null, 'panel'); p.append(el('small', k), el('div', v, 'big')); $('dcStats').append(p);
+      }
+      let q = ($('dcSearch').value || '').toLowerCase(), f = $('dcFilterSource').value;
+      let rows = (dcData.projects || []).filter(p => {
+        if (f === 'GitHub' && p.source !== 'GitHub') return false;
+        if (f === 'GitLab' && p.source !== 'GitLab') return false;
+        if (f === 'vercel1' && !(p.vercel_accounts || []).includes(s.account1_name)) return false;
+        if (f === 'vercel2' && !(p.vercel_accounts || []).includes(s.account2_name)) return false;
+        if (f === 'vm' && !p.vm_link) return false;
+        if (f === 'local' && !p.local_path) return false;
+        if (q && !(`${p.name} ${p.description} ${p.tech} ${p.deploy_url}`).toLowerCase().includes(q)) return false;
+        return true;
+      });
+      $('dcTable').replaceChildren();
+      for (let p of rows) {
+        let nameBox = el('div');
+        nameBox.append(el('span', (p.is_pinned ? '✠ ' : '') + p.name, 'proj-title'), el('div', p.description || 'Sem descrição cadastrada.', 'proj-desc'));
+
+        let srcBox = el('div', null, 'cell-stack');
+        srcBox.append(el('strong', p.source + ' · ' + p.tech), el('small', 'Ramo: ' + (p.branch || 'main'), 'muted'));
+
+        let linkBox = el('div', null, 'cell-stack');
+        if (p.vm_link) linkBox.append(el('span', '🟢 Servidor: ' + p.vm_link.vm_name, 'badge-pill ok'));
+        if (p.local_path) {
+          let folderName = p.local_path.split(/[\\/]/).pop() || p.local_path;
+          let locBadge = el('span', '📁 Pasta: ' + folderName, 'badge-pill');
+          locBadge.title = p.local_path;
+          linkBox.append(locBadge);
+        }
+        if (!p.vm_link && !p.local_path) linkBox.append(el('span', 'Hospedado na Nuvem', 'muted'));
+
+        let depBox = el('div', null, 'cell-stack');
+        if (p.deploy_url) {
+          let hostLabel = p.deploy_url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+          if (hostLabel.length > 30) hostLabel = hostLabel.slice(0, 28) + '…';
+          let a = el('a', '🌐 ' + hostLabel, 'action btn-table');
+          a.href = p.deploy_url; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.title = 'Abrir site: ' + p.deploy_url;
+          depBox.append(a);
+        }
+        if (p.vercel_accounts && p.vercel_accounts.length) {
+          depBox.append(el('small', 'Conta: ' + p.vercel_accounts.join(' • '), 'muted'));
+        }
+        if (!p.deploy_url && (!p.vercel_accounts || !p.vercel_accounts.length)) {
+          depBox.append(el('span', 'Sem link público', 'muted'));
+        }
+
+        let healthBox = el('div');
+        if (p.deploy_url) {
+          let hb = el('button', '🩺 Testar Site', 'btn-table');
+          hb.onclick = async () => {
+            hb.disabled = true; hb.textContent = 'Testando…';
+            try {
+              let res = await req('/api/devcentral/health', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url: p.deploy_url }) });
+              hb.textContent = (res.ok ? '🟢 Online (' : '🟡 Código ' + res.status + ' (') + res.latency_ms + 'ms)';
+              hb.className = 'btn-table ' + (res.ok ? 'ok' : 'warn');
+            } catch (e) { hb.textContent = '🔴 Fora do Ar'; hb.className = 'btn-table bad'; } finally { hb.disabled = false; }
+          };
+          healthBox.append(hb);
+        } else { healthBox.append(el('span', '—', 'muted')); }
+
+        let actBox = el('div', null, 'actions-inline');
+        if (p.local_path) {
+          let aLoc = el('a', '💻 Abrir Pasta no VS Code', 'action btn-table');
+          aLoc.href = 'vscode://file/' + p.local_path.replace(/\\/g, '/');
+          aLoc.title = 'Abrir pasta local: ' + p.local_path;
+          actBox.append(aLoc);
+        }
+        if (p.vm_link) {
+          let aVm = el('a', '🔗 VS Code na VM', 'action btn-table');
+          aVm.href = 'vscode://vscode-remote/ssh-remote+' + encodeURIComponent(p.vm_link.vm_ssh) + (p.vm_link.remote_folder || '/');
+          actBox.append(aVm);
+        }
+        if (p.repo_url) {
+          let aRepo = el('a', 'Código Fonte', 'action btn-table');
+          aRepo.href = p.repo_url; aRepo.target = '_blank'; aRepo.rel = 'noopener noreferrer';
+          actBox.append(aRepo);
+        }
+        cellrow($('dcTable'), [nameBox, srcBox, linkBox, depBox, healthBox, actBox]);
+      }
+    }
+
+    async function loadDevCentral() {
+      $('dcStatus').textContent = '🔄 Carregando seus projetos…';
+      try {
+        dcData = await req('/api/devcentral');
+        renderDevCentral();
+        $('dcStatus').textContent = '✅ ' + (dcData.summary?.total || 0) + ' projetos prontos para uso';
+      } catch (e) { $('dcStatus').textContent = '⚠️ Erro: ' + e.message; }
+    }
+    $('loadDevCentral').onclick = loadDevCentral;
+    $('dcFilterSource').onchange = renderDevCentral;
+    $('dcSearch').oninput = renderDevCentral;
+    loadDevCentral();
+
+    /* Partículas Suaves de Cinzas */
+    (function initAshParticles() {
+      const cvs = $('ashCanvas'); if (!cvs) return;
+      const ctx = cvs.getContext('2d');
+      let w = cvs.width = window.innerWidth, h = cvs.height = window.innerHeight;
+      window.addEventListener('resize', () => { w = cvs.width = window.innerWidth; h = cvs.height = window.innerHeight; });
+      const flakes = Array.from({ length: 34 }, () => ({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 1.8 + 0.6, vy: Math.random() * 0.32 + 0.1, vx: (Math.random() - 0.5) * 0.22, c: Math.random() > 0.3 ? 'rgba(181,155,97,0.25)' : 'rgba(185,28,28,0.32)' }));
+      function step() {
+        ctx.clearRect(0, 0, w, h);
+        for (const f of flakes) {
+          f.y -= f.vy; f.x += f.vx;
+          if (f.y < 0) { f.y = h; f.x = Math.random() * w; }
+          if (f.x < 0) f.x = w; if (f.x > w) f.x = 0;
+          ctx.fillStyle = f.c; ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2); ctx.fill();
+        }
+        requestAnimationFrame(step);
+      }
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) requestAnimationFrame(step);
+    })();
+  </script>
+</body>
+</html>
