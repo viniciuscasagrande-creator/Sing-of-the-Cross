@@ -1,32 +1,8 @@
-# Sing Of The Cross (SOTC) — Multi-Cloud Control Center (V0.1)
+# Sing Of The Cross V0.4 — The Watcher
+Windows 11, Python 3, OpenSSH e VS Code Remote SSH. Extraia o ZIP e execute Iniciar_SOTC.bat ou `python app.py`. Abra http://127.0.0.1:8765. Encerre com Ctrl+C no terminal. Não execute V0.3 e V0.4 simultaneamente na mesma porta.
 
-Painel web independente em estilo **Dark Gothic** para gerenciamento e monitoramento de conexões **Remote SSH** e **VS Code Server** em múltiplas clouds (**Google Cloud**, **AWS**, **Microsoft Azure** e **Oracle Cloud**).
+Use Descobrir aliases SSH e cadastre os aliases do arquivo local com a cloud correspondente. radar-producao vem cadastrada; ajuste seu alias em vms.json se necessário. O SSH não solicita senhas e exige host previamente confiável. Configure o acesso no VS Code primeiro. O diagnóstico usa comandos Linux de leitura, sem instalar agentes. CPU calculada por amostragem de /proc/stat por um segundo; memória via free, disco via df, carga via /proc/loadavg. Ausência de dados não significa zero. A presença de processos não comprova sessão ativa VS Code; falha SSH não comprova VM desligada.
 
-## Identidade Visual Oficial (Dark Gothic)
-- `#0A0B0D` — Preto absoluto
-- `#1D1E23` — Grafite
-- `#8B0000` — Vermelho sangue
-- `#C0C0C0` — Prata metálica
-- `#E8E4DB` — Branco ósseo
-- `logo.png` — Emblema Gótico Sombrio com Cruz e Ceifador incorporado ao cabeçalho
+Selecione uma VM na tabela para ver medidores circulares, detalhes, alertas e histórico. Os alertas são locais na tela: atenção >=75%, crítico >=90%. O histórico SQLite registra consultas reais, conserva 30 dias e a API retorna até 10 mil amostras recentes globais. A coleta depende do painel aberto e atualização automática ligada. CSV exporta as amostras disponíveis da VM e período selecionado. Para manter inventário de uma instalação anterior, copie seu vms.json com o painel encerrado. Os dados ficam locais, sem serviços externos de armazenamento.
 
-## Arquivos do Projeto
-| Arquivo | Função |
-| :--- | :--- |
-| `app.py` | Backend Python nativo na porta `8765` (zero bibliotecas externas) |
-| `server.js` | Backend alternativo em Node.js nativo na porta `8765` |
-| `index.html` | Interface web Dark Gothic com filtros das 4 clouds, métricas e modais |
-| `vms.json` | Inventário das máquinas virtuais (Prévia + hosts detectados em `~/.ssh`) |
-| `logo.png` | Logo oficial do Sing Of The Cross |
-| `iniciar_sotc.bat` | Atalho de 1 clique para iniciar o painel e abrir o navegador |
-
-## Como Executar
-
-### Opção 1: Com 1 clique (Windows)
-Dê duplo-clique em **`iniciar_sotc.bat`**. Ele detecta automaticamente o seu Python 3.13 (`C:\laragon\bin\python\python-3.13\python.exe`) ou Node.js e abre **`http://127.0.0.1:8765`**.
-
-### Opção 2: Pelo terminal
-```powershell
-C:\laragon\bin\python\python-3.13\python.exe app.py
-```
-E acesse no navegador: **[http://127.0.0.1:8765](http://127.0.0.1:8765)**
+Intervenções disponíveis: abrir VS Code, copiar comando SSH e abrir console GCP da VM cadastrada. Não há comandos de reinicialização, desligamento ou alteração remota. APIs de cloud ainda não integradas. O painel deve ficar restrito a localhost; não exponha a porta na rede. Testado em ambiente Linux com dados simulados para o parser e SQLite; Windows e VM real requerem validação.

@@ -1,8 +1,8 @@
 @echo off
-title SING OF THE CROSS (SOTC) - V0.2 Dark Gothic Edition
+title SING OF THE CROSS (SOTC) - V0.4 The Watcher
 cd /d "%~dp0"
 echo =========================================================
-echo   SING OF THE CROSS - MULTI-CLOUD COMMAND CENTER (V0.2)
+echo   SING OF THE CROSS - V0.4 THE WATCHER (DARK GOTHIC)
 echo   URL: http://127.0.0.1:8765
 echo =========================================================
 start "" "http://127.0.0.1:8765"
