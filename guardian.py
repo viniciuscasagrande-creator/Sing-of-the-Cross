@@ -34,6 +34,11 @@ def audit(alias,action,result):
     with sqlite3.connect(ROOT/'history.sqlite3') as db:
         db.execute('CREATE TABLE IF NOT EXISTS interventions(ts INTEGER, alias TEXT, action TEXT, ok INTEGER)')
         db.execute('INSERT INTO interventions VALUES(?,?,?,?)',(int(time.time()),alias,action,int(result['ok'])))
+    try:
+        import devcentral_bridge
+        devcentral_bridge.push_audit_to_neon(alias,action,bool(result['ok']))
+    except Exception:
+        pass
 
 def execute(vm,item):
     action=item.get('action'); alias=field(vm,'ssh')

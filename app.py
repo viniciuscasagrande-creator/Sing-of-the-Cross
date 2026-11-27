@@ -50,6 +50,7 @@ def record(rows):
         now=int(time.time())
         db.executemany('INSERT INTO samples VALUES (?,?,?)',[(now,r['ssh'],json.dumps(r)) for r in rows])
         db.execute('DELETE FROM samples WHERE ts < ?', (now-30*86400,))
+    threading.Thread(target=devcentral_bridge.push_vm_telemetry_to_neon, args=(rows,), daemon=True).start()
 def history():
     with sqlite3.connect(DB) as db:
         db.execute('CREATE TABLE IF NOT EXISTS samples (ts INTEGER, alias TEXT, payload TEXT)')
