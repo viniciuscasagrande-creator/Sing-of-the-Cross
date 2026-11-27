@@ -8,7 +8,7 @@ import urllib.request
 from pathlib import Path
 
 DEVCENTRAL_DIR = Path(r"D:\Projetos Vs Code\DevCentral")
-LOCAL_PROJECTS_ROOT = Path(r"D:\Projetos Vs Code")
+LOCAL_PROJECTS_ROOTS = [Path(r"D:\Projetos Vs Code"), Path(r"E:\\")]
 _SCHEMA_READY = False
 
 
@@ -50,7 +50,7 @@ def neon_query(query, params=None):
             "Content-Type": "application/json",
             "Neon-Connection-String": db_url,
             "Accept": "application/json",
-            "User-Agent": "SingOfTheCross-TheConvergence/0.6.5",
+            "User-Agent": "SingOfTheCross-TheSentinel/0.7.0",
         },
         method="POST",
     )
@@ -60,10 +60,26 @@ def neon_query(query, params=None):
 
 
 def ensure_sotc_neon_schema():
-    """Cria as tabelas de espelhamento de telemetria do SOTC no banco Neon PostgreSQL."""
+    """Cria as tabelas de persistência V0.7 The Sentinel no banco Neon PostgreSQL."""
     global _SCHEMA_READY
     if _SCHEMA_READY:
         return
+    neon_query(
+        """
+        CREATE TABLE IF NOT EXISTS sotc_agents (
+            agent_id TEXT PRIMARY KEY,
+            hostname TEXT NOT NULL,
+            os_name TEXT NOT NULL DEFAULT 'Windows 11',
+            version TEXT NOT NULL DEFAULT '0.7.0',
+            interval_sec INTEGER NOT NULL DEFAULT 30,
+            vms_count INTEGER NOT NULL DEFAULT 0,
+            local_projects JSONB NOT NULL DEFAULT '{}'::jsonb,
+            status TEXT NOT NULL DEFAULT 'ONLINE',
+            last_heartbeat TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            last_epoch BIGINT NOT NULL DEFAULT 0
+        )
+        """
+    )
     neon_query(
         """
         CREATE TABLE IF NOT EXISTS sotc_vm_snapshots (
@@ -88,6 +104,21 @@ def ensure_sotc_neon_schema():
     )
     neon_query(
         """
+        CREATE TABLE IF NOT EXISTS sotc_alerts (
+            id SERIAL PRIMARY KEY,
+            ts BIGINT NOT NULL,
+            vm_ssh TEXT NOT NULL,
+            metric TEXT NOT NULL,
+            value TEXT NOT NULL,
+            severity TEXT NOT NULL,
+            message TEXT NOT NULL,
+            resolved BOOLEAN NOT NULL DEFAULT false,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+        """
+    )
+    neon_query(
+        """
         CREATE TABLE IF NOT EXISTS sotc_audit_log (
             id SERIAL PRIMARY KEY,
             ts BIGINT NOT NULL,
@@ -101,12 +132,49 @@ def ensure_sotc_neon_schema():
     _SCHEMA_READY = True
 
 
-def push_vm_telemetry_to_neon(rows):
-    """Sincroniza o estado atual e histórico das VMs coletadas localmente para o Neon PostgreSQL."""
+def scan_local_projects_map():
+    """Escaneia as pastas locais do Windows 11 para sincronizar com o banco Neon."""
+    found = {}
+    for root in LOCAL_PROJECTS_ROOTS:
+        if not root.exists():
+            continue
+        try:
+            for p in root.iterdir():
+                if p.is_dir() and not p.name.startswith("."):
+                    norm = re.sub(r"[^a-z0-9]", "", p.name.lower())
+                    if norm:
+                        found[norm] = str(p)
+        except OSError:
+            pass
+    return found
+
+
+def push_sentinel_cycle_to_neon(agent_id, hostname, os_name, interval_sec, vms_rows, alerts_rows, local_projects_map=None):
+    """Registra heartbeat do Sentinel Agent, snapshots de VMs, histórico e alertas no Neon."""
     try:
         ensure_sotc_neon_schema()
         now = int(time.time())
-        for r in rows:
+        lmap = local_projects_map if local_projects_map is not None else scan_local_projects_map()
+
+        neon_query(
+            """
+            INSERT INTO sotc_agents (agent_id, hostname, os_name, version, interval_sec, vms_count, local_projects, status, last_heartbeat, last_epoch)
+            VALUES ($1, $2, $3, '0.7.0', $4, $5, $6::jsonb, 'ONLINE', NOW(), $7)
+            ON CONFLICT (agent_id) DO UPDATE
+            SET hostname = EXCLUDED.hostname,
+                os_name = EXCLUDED.os_name,
+                version = '0.7.0',
+                interval_sec = EXCLUDED.interval_sec,
+                vms_count = EXCLUDED.vms_count,
+                local_projects = CASE WHEN EXCLUDED.local_projects::text != '{}' THEN EXCLUDED.local_projects ELSE sotc_agents.local_projects END,
+                status = 'ONLINE',
+                last_heartbeat = NOW(),
+                last_epoch = EXCLUDED.last_epoch
+            """,
+            [agent_id, hostname, os_name, int(interval_sec), len(vms_rows), json.dumps(lmap, ensure_ascii=False), now],
+        )
+
+        for r in vms_rows:
             ssh_alias = r.get("ssh") or r.get("name") or "unknown"
             name = r.get("name") or ssh_alias
             cloud = r.get("cloud") or "Google Cloud"
@@ -127,14 +195,79 @@ def push_vm_telemetry_to_neon(rows):
                 "INSERT INTO sotc_vm_history (ts, ssh, payload) VALUES ($1, $2, $3::jsonb)",
                 [now, ssh_alias, payload_json],
             )
+
+        if alerts_rows is not None:
+            neon_query("DELETE FROM sotc_alerts WHERE ts < $1", [now - 7 * 86400])
+            for a in alerts_rows:
+                neon_query(
+                    """
+                    INSERT INTO sotc_alerts (ts, vm_ssh, metric, value, severity, message, resolved)
+                    VALUES ($1, $2, $3, $4, $5, $6, false)
+                    """,
+                    [now, a.get("vm_ssh", ""), a.get("metric", ""), a.get("value", ""), a.get("severity", "WARNING"), a.get("message", "")],
+                )
+
         neon_query("DELETE FROM sotc_vm_history WHERE ts < $1", [now - 30 * 86400])
-        return {"ok": True, "synced_vms": len(rows), "ts": now}
+        return {"ok": True, "synced_vms": len(vms_rows), "alerts_logged": len(alerts_rows or []), "ts": now}
     except Exception as e:
         return {"ok": False, "error": str(e)}
 
 
+def push_vm_telemetry_to_neon(rows):
+    """Atalho usado pelo app.py quando uma consulta ocorre no painel local."""
+    import platform
+    import socket
+    from agent import sentinel
+    cfg = sentinel.load_agent_config()
+    alerts = sentinel.evaluate_alerts(rows, cfg)
+    return push_sentinel_cycle_to_neon(
+        agent_id=cfg.get("agent_id", "win11-sentinel-01"),
+        hostname=socket.gethostname(),
+        os_name=f"Windows {platform.release()}",
+        interval_sec=int(cfg.get("interval_seconds", 30)),
+        vms_rows=rows,
+        alerts_rows=alerts,
+    )
+
+
+def fetch_sentinel_status():
+    """Retorna estado dos agentes Sentinel, idade do heartbeat (staleness) e alertas recentes."""
+    ensure_sotc_neon_schema()
+    now = int(time.time())
+    agents_raw = neon_query("SELECT * FROM sotc_agents ORDER BY last_epoch DESC")
+    alerts_raw = neon_query("SELECT * FROM sotc_alerts ORDER BY id DESC LIMIT 30")
+
+    agents = []
+    for a in agents_raw:
+        last_ep = int(a.get("last_epoch") or 0)
+        age_sec = max(0, now - last_ep) if last_ep else 999999
+        if age_sec <= 90:
+            comm_state = "ONLINE"
+        elif age_sec <= 180:
+            comm_state = "ATENÇÃO (STALE)"
+        else:
+            comm_state = "OFFLINE / DESATUALIZADO"
+        agents.append({
+            "agent_id": a.get("agent_id", "win11-sentinel-01"),
+            "hostname": a.get("hostname", "Windows-11"),
+            "os_name": a.get("os_name", "Windows 11"),
+            "version": a.get("version", "0.7.0"),
+            "interval_sec": int(a.get("interval_sec") or 30),
+            "vms_count": int(a.get("vms_count") or 0),
+            "age_seconds": age_sec,
+            "comm_state": comm_state,
+            "last_heartbeat": str(a.get("last_heartbeat", "")),
+        })
+
+    return {
+        "ok": True,
+        "server_time": now,
+        "agents": agents,
+        "alerts": alerts_raw,
+    }
+
+
 def push_audit_to_neon(alias, action, ok):
-    """Espelha eventos de auditoria Guardian/Reaper para o Neon PostgreSQL."""
     try:
         ensure_sotc_neon_schema()
         neon_query(
@@ -146,7 +279,6 @@ def push_audit_to_neon(alias, action, ok):
 
 
 def fetch_vm_snapshots_from_neon():
-    """Usado quando o painel roda na nuvem (Vercel): lê o último snapshot das VMs salvo no Neon."""
     ensure_sotc_neon_schema()
     rows = neon_query("SELECT ssh, payload, updated_at FROM sotc_vm_snapshots ORDER BY ssh ASC")
     out = []
@@ -161,7 +293,6 @@ def fetch_vm_snapshots_from_neon():
 
 
 def fetch_vm_history_from_neon(limit=500):
-    """Usado quando o painel roda na nuvem (Vercel): lê o histórico de telemetria salvo no Neon."""
     ensure_sotc_neon_schema()
     rows = neon_query(
         f"SELECT ts, payload FROM sotc_vm_history ORDER BY ts DESC LIMIT {int(limit)}"
@@ -177,7 +308,6 @@ def fetch_vm_history_from_neon(limit=500):
 
 
 def fetch_audit_from_neon(limit=100):
-    """Lê os eventos de auditoria espelhados no Neon."""
     ensure_sotc_neon_schema()
     rows = neon_query(
         f"SELECT ts, alias, action, ok FROM sotc_audit_log ORDER BY id DESC LIMIT {int(limit)}"
@@ -193,28 +323,21 @@ def fetch_audit_from_neon(limit=100):
     ]
 
 
-def match_local_folder(project_name, existing_local_path=""):
-    """Procura pasta correspondente em D:\\Projetos Vs Code para abertura direta no VS Code."""
-    if existing_local_path and Path(existing_local_path).exists():
-        return str(Path(existing_local_path))
-    if not LOCAL_PROJECTS_ROOT.exists():
-        return ""
+def match_local_folder(project_name, existing_local_path="", cached_map=None):
+    """Procura pasta correspondente localmente ou no mapa sincronizado pelo Sentinel Agent no Neon."""
+    if existing_local_path:
+        return str(existing_local_path)
     norm = re.sub(r"[^a-z0-9]", "", project_name.lower())
     if not norm:
         return ""
-    try:
-        for p in LOCAL_PROJECTS_ROOT.iterdir():
-            if p.is_dir():
-                p_norm = re.sub(r"[^a-z0-9]", "", p.name.lower())
-                if p_norm == norm or (len(norm) >= 5 and (norm in p_norm or p_norm in norm)):
-                    return str(p)
-    except OSError:
-        pass
+    lmap = cached_map if cached_map is not None else scan_local_projects_map()
+    for p_norm, full_path in lmap.items():
+        if p_norm == norm or (len(norm) >= 5 and (norm in p_norm or p_norm in norm)):
+            return full_path
     return ""
 
 
 def infer_vm_link(project):
-    """Associa automaticamente projetos relacionados ao Radar/GCP com a VM radar-producao."""
     text = f"{project.get('name', '')} {project.get('description', '')} {project.get('deploy_url', '')}".lower()
     if any(k in text for k in ("radar", "disk", "ingresso", "34.70.140.94", "gcp", "talent")):
         return {
@@ -248,11 +371,15 @@ def fetch_overview():
     except Exception:
         sync_logs = []
 
-    try:
-        snapshots_count = neon_query("SELECT COUNT(*) AS cnt FROM sotc_vm_snapshots")
-        neon_vms_synced = int(snapshots_count[0].get("cnt", 0)) if snapshots_count else 0
-    except Exception:
-        neon_vms_synced = 0
+    cached_local_map = scan_local_projects_map()
+    if not cached_local_map:
+        try:
+            ag = neon_query("SELECT local_projects FROM sotc_agents ORDER BY last_epoch DESC LIMIT 1")
+            if ag and ag[0].get("local_projects"):
+                lp = ag[0]["local_projects"]
+                cached_local_map = json.loads(lp) if isinstance(lp, str) else lp
+        except Exception:
+            cached_local_map = {}
 
     projects = []
     for r in projects_raw:
@@ -266,7 +393,7 @@ def fetch_overview():
         if isinstance(vercel_accounts, str):
             vercel_accounts = [x for x in vercel_accounts.strip("{}").split(",") if x]
 
-        local_dir = match_local_folder(r.get("name", ""), r.get("local_path", ""))
+        local_dir = match_local_folder(r.get("name", ""), r.get("local_path", ""), cached_local_map)
         vm_link = infer_vm_link(r)
 
         projects.append({
@@ -297,7 +424,6 @@ def fetch_overview():
         "with_deploy": sum(1 for p in projects if p["deploy_url"] or p["deployments"]),
         "linked_to_vm": sum(1 for p in projects if p["vm_link"]),
         "local_found": sum(1 for p in projects if p["local_path"]),
-        "neon_vms_synced": neon_vms_synced,
         "account1_name": env.get("VERCEL_ACCOUNT_1_NAME", "Vercel Conta 1"),
         "account2_name": env.get("VERCEL_ACCOUNT_2_NAME", "Vercel Conta 2"),
         "last_sync": sync_logs[0] if sync_logs else None,
@@ -311,7 +437,6 @@ def fetch_overview():
 
 
 def check_http_health(url):
-    """Verifica a disponibilidade e latência HTTP de um deploy_url do DevCentral."""
     if not url or not isinstance(url, str):
         raise ValueError("URL inválida")
     if not url.startswith(("http://", "https://")):
@@ -323,7 +448,7 @@ def check_http_health(url):
     start = time.monotonic()
     req = urllib.request.Request(
         url,
-        headers={"User-Agent": "SingOfTheCross-HealthProbe/0.6.5"},
+        headers={"User-Agent": "SingOfTheCross-HealthProbe/0.7.0"},
         method="GET",
     )
     try:

@@ -1,0 +1,19 @@
+{
+  "agent_id": "win11-sentinel-01",
+  "interval_seconds": 30,
+  "vercel_url": "https://cloud-vm-monitor.vercel.app",
+  "thresholds": {
+    "cpu_warn": 75,
+    "cpu_crit": 90,
+    "ram_warn": 75,
+    "ram_crit": 90,
+    "disk_warn": 75,
+    "disk_crit": 90,
+    "latency_warn_ms": 150,
+    "latency_crit_ms": 500,
+    "agent_stale_warn_sec": 90,
+    "agent_stale_crit_sec": 180,
+    "ssh_consecutive_failures_warn": 2,
+    "ssh_consecutive_failures_crit": 3
+  }
+}

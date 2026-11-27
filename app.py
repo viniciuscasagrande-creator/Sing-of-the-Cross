@@ -68,15 +68,18 @@ def status():
         record(results); CACHE=results; LAST=time.monotonic(); return results
 
 def probe(vm):
-    out=dict(vm,ssh_status='unknown',server_status='unknown',detail='',checked=time.strftime('%H:%M:%S'))
+    out=dict(vm,ssh_status='unknown',server_status='unknown',detail='',checked=time.strftime('%H:%M:%S'),checked_epoch=int(time.time()))
     if not shutil.which('ssh'):
         out['detail']='Cliente OpenSSH não encontrado'; return out
-    # Detecta processos remotos, não confirma uma sessão de editor ativa.
+    # Detecta processos remotos e mede latência SSH (descontando o sleep 1 da amostragem de CPU).
     command="printf 'SOTC_HOST '; hostname; printf 'SOTC_UP '; cut -d. -f1 /proc/uptime; printf 'SOTC_CORES '; getconf _NPROCESSORS_ONLN; printf 'SOTC_CPU '; awk '/^cpu / {print $2+$3+$4+$5+$6+$7+$8, $5+$6}' /proc/stat; sleep 1; printf 'SOTC_CPU '; awk '/^cpu / {print $2+$3+$4+$5+$6+$7+$8, $5+$6}' /proc/stat; printf 'SOTC_RAM '; free -m | awk '/^Mem:/ {print $3, $2}'; printf 'SOTC_DISK '; df -P / | awk 'NR==2 {print $5}'; printf 'SOTC_LOAD '; cat /proc/loadavg; ps -eo args | grep -E '[.]vscode-server|[.]vscode-remote|[.]vscode-server-insiders' >/dev/null && echo SOTC_SERVER_PRESENT || echo SOTC_SERVER_NOT_DETECTED"
+    t0=time.monotonic()
     try:
         p=subprocess.run(['ssh','-o','BatchMode=yes','-o','StrictHostKeyChecking=yes','-o','ConnectTimeout=5','-o','ConnectionAttempts=1','-o','ClearAllForwardings=yes','-o','RequestTTY=no',vm['ssh'],command],capture_output=True,text=True,timeout=12)
+        elapsed_ms=max(1,round((time.monotonic()-t0-1.0)*1000))
         if p.returncode==0:
             out['ssh_status']='ok'
+            out['latency_ms']=elapsed_ms
             cpu=[]
             for line in p.stdout.splitlines():
                 if line.startswith('SOTC_CPU '):
@@ -105,12 +108,15 @@ class Handler(BaseHTTPRequestHandler):
     def send_data(self, data, kind='application/json',status=200):
         self.send_response(status); self.send_header('Content-Type',kind); self.send_header('Cache-Control','no-store'); self.send_header('X-Content-Type-Options','nosniff'); self.send_header('Content-Security-Policy',"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self'; frame-ancestors 'none'"); self.send_header('Content-Length',str(len(data))); self.end_headers(); self.wfile.write(data)
     def do_POST(self):
-        if self.path not in ('/api/inventory','/api/guardian','/api/reaper','/api/devcentral/health') or self.headers.get('Host') not in ('127.0.0.1:8765','localhost:8765') or self.headers.get('Origin') not in ('http://127.0.0.1:8765','http://localhost:8765') or self.headers.get('Content-Type') != 'application/json':
+        if self.path not in ('/api/inventory','/api/guardian','/api/reaper','/api/devcentral/health','/api/sentinel/run') or self.headers.get('Host') not in ('127.0.0.1:8765','localhost:8765') or self.headers.get('Origin') not in ('http://127.0.0.1:8765','http://localhost:8765') or self.headers.get('Content-Type') != 'application/json':
             self.send_error(403); return
         try:
             n=int(self.headers.get('Content-Length','0'))
-            if not 0<n<4096: raise ValueError('Tamanho inválido')
-            item=json.loads(self.rfile.read(n))
+            if not 0<=n<8192: raise ValueError('Tamanho inválido')
+            item=json.loads(self.rfile.read(n)) if n>0 else {}
+            if self.path == '/api/sentinel/run':
+                from agent import sentinel
+                self.send_data(json.dumps(sentinel.run_cycle(),ensure_ascii=False).encode()); return
             if self.path == '/api/devcentral/health':
                 self.send_data(json.dumps(devcentral_bridge.check_http_health(item.get('url','')),ensure_ascii=False).encode()); return
             if self.path in ('/api/guardian','/api/reaper'):
@@ -146,6 +152,8 @@ class Handler(BaseHTTPRequestHandler):
             elif path=='/logo.png': self.send_data((ROOT/'logo.png').read_bytes(),'image/png')
             elif path=='/api/guardian/events': self.send_data(json.dumps(guardian.events()).encode())
             elif path=='/api/devcentral': self.send_data(json.dumps(devcentral_bridge.fetch_overview(),ensure_ascii=False).encode())
+            elif path in ('/api/sentinel/heartbeat','/api/sentinel/alerts','/api/sentinel/telemetry'):
+                self.send_data(json.dumps(devcentral_bridge.fetch_sentinel_status(),ensure_ascii=False).encode())
             elif path=='/api/history': self.send_data(json.dumps(history(),ensure_ascii=False).encode())
             elif path=='/api/aliases': self.send_data(json.dumps(aliases()).encode())
             elif path=='/api/status':
@@ -155,5 +163,5 @@ class Handler(BaseHTTPRequestHandler):
         except Exception as e: self.send_data(json.dumps({'error':str(e)}).encode(),status=500)
 
 if __name__=='__main__':
-    print('Sing Of The Cross: http://127.0.0.1:8765')
+    print('Sing Of The Cross V0.7 The Sentinel: http://127.0.0.1:8765')
     ThreadingHTTPServer(('127.0.0.1',8765),Handler).serve_forever()

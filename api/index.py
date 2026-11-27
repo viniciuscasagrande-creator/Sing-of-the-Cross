@@ -1,7 +1,7 @@
 """
-Sing Of The Cross (SOTC) - Vercel Serverless Cloud Handler (Modo Cloud Mirror)
-Lê a telemetria espelhada das VMs (sotc_vm_snapshots / sotc_vm_history) e os 42 projetos
-diretamente do banco Neon PostgreSQL usando DATABASE_URL, sem expor chaves SSH na nuvem.
+Sing Of The Cross (SOTC) - Vercel Serverless Cloud Handler (V0.7 The Sentinel)
+Lê a telemetria espelhada das VMs, o status do Sentinel Agent (heartbeat/alertas)
+e os 42 projetos do DevCentral diretamente do banco Neon PostgreSQL.
 """
 import json
 import sys
@@ -48,6 +48,9 @@ class handler(BaseHTTPRequestHandler):
                 self.send_data(json.dumps(rows, ensure_ascii=False).encode("utf-8"))
             elif path == "/api/devcentral":
                 data = devcentral_bridge.fetch_overview()
+                self.send_data(json.dumps(data, ensure_ascii=False).encode("utf-8"))
+            elif path in ("/api/sentinel/heartbeat", "/api/sentinel/alerts", "/api/sentinel/telemetry"):
+                data = devcentral_bridge.fetch_sentinel_status()
                 self.send_data(json.dumps(data, ensure_ascii=False).encode("utf-8"))
             elif path == "/api/aliases":
                 self.send_data(b'["radar-producao"]')
