@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'br.com.sotc.monitor',
-  appName: 'Sing Of The Cross',
+  appName: 'Sign Of The Cross',
   webDir: 'frontend',
   server: {
     url: 'https://cloud-vm-monitor.vercel.app',

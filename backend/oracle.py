@@ -1,5 +1,5 @@
 """
-SING OF THE CROSS (SOTC) — Motor Didático de Diagnóstico, Limpeza e FinOps em Português
+SIGN OF THE CROSS (SOTC) — Motor Didático de Diagnóstico, Limpeza e FinOps em Português
 Permite monitorar e intervir na VM com 1 clique sem precisar abrir terminal SSH.
 """
 import guardian
@@ -312,7 +312,7 @@ def build_command_center_suite(vms_rows, projects_data=None, sentinel_data=None,
         "environments": [
             {"env": "Produção (GCP us-central1-a)", "host": "34.70.140.94 (radar-producao)", "proxy": "Caddy 2 (TLS Auto)", "runtime": "Node.js + Systemd", "status": "HEALTHY"},
             {"env": "Edge Serverless (Vercel 1 & 2)", "host": "cloud-vm-monitor.vercel.app + 28 apps", "proxy": "Vercel Edge Network", "runtime": "Python 3.12 / Next.js", "status": "HEALTHY"},
-            {"env": "Estação de Comando (Windows 11)", "host": "127.0.0.1:8765 (SingOfTheCross.exe)", "proxy": "Local Loopback + CSRF Guard", "runtime": "Python 3.13 (Laragon)", "status": "ONLINE"},
+            {"env": "Estação de Comando (Windows 11)", "host": "127.0.0.1:8765 (SignOfTheCross.exe)", "proxy": "Local Loopback + CSRF Guard", "runtime": "Python 3.13 (Laragon)", "status": "ONLINE"},
         ],
     }
 
@@ -361,7 +361,7 @@ def build_command_center_suite(vms_rows, projects_data=None, sentinel_data=None,
         ],
         "databases_connected": [
             {"name": "Neon Serverless PostgreSQL", "role": "Catálogo DevCentral + Telemetria SOTC Cloud", "connection": "HTTPS Pooler (/sql)", "status": "CONECTADO"},
-            {"name": "SQLite Local (history.sqlite3)", "role": "Cache de Alta Velocidade (Windows 11)", "connection": "Disco Local F:\\Sing Of The Cross", "status": "CONECTADO"},
+            {"name": "SQLite Local (history.sqlite3)", "role": "Cache de Alta Velocidade (Windows 11)", "connection": "Disco Local F:\\Sign Of The Cross", "status": "CONECTADO"},
         ],
         "domains_and_endpoints": [
             {"endpoint": "34.70.140.94:443 (Caddy TLS)", "target": "127.0.0.1:3000 (Node.js)", "status": "ATIVO"},

@@ -24,7 +24,7 @@
 
         <activity
             android:name=".MainActivity"
-            android:label="Sing Of The Cross"
+            android:label="Sign Of The Cross"
             android:exported="true"
             android:screenOrientation="portrait"
             android:configChanges="orientation|screenSize|keyboardHidden|uiMode">

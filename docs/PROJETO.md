@@ -1,6 +1,6 @@
-# Sing Of The Cross — especificação central
+# Sign Of The Cross — especificação central
 
-Nome oficial: Sing Of The Cross (SOTC). Plataforma local Windows 11, interface web no navegador, VS Code Remote SSH. Google Cloud, AWS, Azure e Oracle Cloud. Primeira VM: radar-producao, Google Cloud, us-central1-a. Alias presumido: radar-producao.
+Nome oficial: Sign Of The Cross (SOTC). Plataforma local Windows 11, interface web no navegador, VS Code Remote SSH. Google Cloud, AWS, Azure e Oracle Cloud. Primeira VM: radar-producao, Google Cloud, us-central1-a. Alias presumido: radar-producao.
 
 ## Diretriz visual obrigatória
 Dark Gothic Cinematic em todos os componentes: preto abissal #080808, obsidiana #121216, sangue #8B0000, carmesim #B91C1C, prata #A8A9AD, osso #E8E4DB, ouro antigo #B59B61. Logo oficial, cruz gótica, ceifador, dragões, molduras metálicas, névoa opcional, gráficos circulares e históricos. Legibilidade, contraste e desempenho prioritários. Referências originais na pasta referencias-visuais.

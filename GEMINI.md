@@ -1,10 +1,10 @@
-# SING OF THE CROSS (SOTC) — Diretrizes Oficiais do Projeto
+# SIGN OF THE CROSS (SOTC) — Diretrizes Oficiais do Projeto
 
-> **SING OF THE CROSS — DARK GOTHIC CINEMATIC EDITION**
+> **SIGN OF THE CROSS — DARK GOTHIC CINEMATIC EDITION**
 > Uma central de operações multi-cloud com arquitetura tecnológica moderna e identidade visual gótica, sombria, medieval e espectral.
 
 ## 1. Identidade Visual Obrigatória (`Dark Gothic Cinematic`)
-Todas as telas, módulos e componentes do **Sing Of The Cross (SOTC)** devem seguir obrigatoriamente a paleta e ambientação **Dark Gothic Cinematic**:
+Todas as telas, módulos e componentes do **Sign Of The Cross (SOTC)** devem seguir obrigatoriamente a paleta e ambientação **Dark Gothic Cinematic**:
 
 | Cor | Hex | Aplicação |
 | :--- | :--- | :--- |
@@ -40,9 +40,9 @@ Todas as telas, módulos e componentes do **Sing Of The Cross (SOTC)** devem seg
 
 ## 2. Estrutura Modular de Pastas do Projeto
 ```text
-F:\Sing Of The Cross\
+F:\Sign Of The Cross\
 ├── app.py                        # Servidor HTTP principal + Worker Daemon 24/7 (porta 127.0.0.1:8765)
-├── SingOfTheCross.exe            # Launcher nativo Windows 11
+├── SignOfTheCross.exe            # Launcher nativo Windows 11
 ├── vms.json                      # Inventário local das máquinas virtuais
 ├── vercel.json                   # Roteamento Serverless para deploy Cloud Mirror na Vercel
 ├── GEMINI.md                     # Diretrizes oficiais e regras permanentes do projeto
@@ -71,7 +71,7 @@ F:\Sing Of The Cross\
 │   ├── iniciar_sotc.bat          # Inicializador rápido do Cockpit local
 │   ├── Iniciar_Sentinel_Agent.bat# Inicializador do Agente Sentinel 24/7
 │   ├── Iniciar_Tunel_Cloudflare.bat # Túnel HTTPS Zero-Trust opcional
-│   └── launcher.cs               # Código-fonte C# do SingOfTheCross.exe
+│   └── launcher.cs               # Código-fonte C# do SignOfTheCross.exe
 ├── docs/
 │   ├── AUDITORIA_TECNICA_SOTC.md # Relatório completo de auditoria e arquitetura
 │   ├── PROJETO.md                # Roadmap e especificações históricas

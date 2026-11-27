@@ -1,5 +1,5 @@
 """
-Sing Of The Cross (SOTC) - Vercel Serverless Cloud Handler (V1.0 The Throne & Mobile APK)
+Sign Of The Cross (SOTC) - Vercel Serverless Cloud Handler (V1.0 The Throne & Mobile APK)
 Lê a telemetria espelhada das VMs, o status do Sentinel Agent (heartbeat/alertas),
 os 7 Dashboards Executivos e os 42 projetos do DevCentral diretamente do Neon PostgreSQL.
 """
@@ -53,10 +53,10 @@ class handler(BaseHTTPRequestHandler):  # pylint: disable=invalid-name
             elif path == "/sotc.ico":
                 ico_bytes = (assets_dir / "sotc.ico").read_bytes()
                 self.send_data(ico_bytes, "image/x-icon")
-            elif path in ("/SingOfTheCross.apk", "/SOTC-Monitor-v1.0.0.apk"):
+            elif path in ("/SignOfTheCross.apk", "/SOTC-Monitor-v1.0.0.apk"):
                 apk_file = assets_dir / "SOTC-Monitor-v1.0.0.apk"
                 if not apk_file.exists():
-                    apk_file = assets_dir / "SingOfTheCross.apk"
+                    apk_file = assets_dir / "SignOfTheCross.apk"
                 self.send_data(apk_file.read_bytes(), apk_type)
             elif path == "/api/status":
                 rows = devcentral_bridge.fetch_vm_snapshots_from_neon()

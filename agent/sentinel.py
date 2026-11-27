@@ -1,5 +1,5 @@
 """
-SING OF THE CROSS (SOTC) — V0.7 THE SENTINEL
+SIGN OF THE CROSS (SOTC) — V0.7 THE SENTINEL
 Agente Local Windows 11 para Monitoramento Contínuo (Independente do Navegador)
 Coleta telemetria SSH, latência (ms), processos locais do VS Code e sincroniza com Neon PostgreSQL.
 """
@@ -174,7 +174,7 @@ def main():
     cfg = load_agent_config()
     interval = int(cfg.get("interval_seconds", 30))
     print("=================================================================")
-    print("  SING OF THE CROSS - V0.7 THE SENTINEL AGENT (WINDOWS 11)")
+    print("  SIGN OF THE CROSS - V0.7 THE SENTINEL AGENT (WINDOWS 11)")
     print(f"  Agente: {cfg.get('agent_id')} | Ciclo: {interval}s | Destino: Neon PostgreSQL")
     print("=================================================================")
     while True:

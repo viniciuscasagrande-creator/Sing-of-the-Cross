@@ -1,5 +1,5 @@
 -- ============================================================================
--- SING OF THE CROSS (SOTC) — V0.7 THE SENTINEL
+-- SIGN OF THE CROSS (SOTC) — V0.7 THE SENTINEL
 -- Schema de Persistência Multi-Cloud & Monitoramento Contínuo (Neon PostgreSQL)
 -- ============================================================================
 

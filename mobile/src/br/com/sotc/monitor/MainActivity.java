@@ -286,7 +286,7 @@ public class MainActivity extends Activity {
         logoImg.setLayoutParams(imgLp);
 
         TextView title = new TextView(this);
-        title.setText("SING OF THE CROSS");
+        title.setText("SIGN OF THE CROSS");
         title.setTextColor(Color.parseColor("#E8E4DB"));
         title.setTextSize(22f);
         title.setTypeface(Typeface.SERIF, Typeface.BOLD);
@@ -388,7 +388,7 @@ public class MainActivity extends Activity {
             if (km != null && km.isKeyguardSecure()) {
                 Intent authIntent = km.createConfirmDeviceCredentialIntent(
                         "Autenticação SOTC Guardian",
-                        "Confirme sua biometria ou PIN para desbloquear operações críticas no Sing Of The Cross.");
+                        "Confirme sua biometria ou PIN para desbloquear operações críticas no Sign Of The Cross.");
                 if (authIntent != null) {
                     startActivityForResult(authIntent, REQ_AUTH);
                     return;

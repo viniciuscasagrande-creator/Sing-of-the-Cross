@@ -1,8 +1,8 @@
 @echo off
-title SING OF THE CROSS (SOTC) - Multi-Cloud Command Center & Flight Deck
+title SIGN OF THE CROSS (SOTC) - Multi-Cloud Command Center & Flight Deck
 cd /d "%~dp0.."
 echo =================================================================
-echo   SING OF THE CROSS - MULTI-CLOUD COMMAND CENTER & FLIGHT DECK
+echo   SIGN OF THE CROSS - MULTI-CLOUD COMMAND CENTER & FLIGHT DECK
 echo   URL: http://127.0.0.1:8765
 echo =================================================================
 start "" "http://127.0.0.1:8765"

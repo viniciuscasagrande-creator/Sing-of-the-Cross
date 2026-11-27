@@ -50,7 +50,7 @@ def neon_query(query, params=None):
             "Content-Type": "application/json",
             "Neon-Connection-String": db_url,
             "Accept": "application/json",
-            "User-Agent": "SingOfTheCross-TheSentinel/0.7.0",
+            "User-Agent": "SignOfTheCross-TheSentinel/0.7.0",
         },
         method="POST",
     )
@@ -523,7 +523,7 @@ def check_http_health(url):
     start = time.monotonic()
     req = urllib.request.Request(
         url,
-        headers={"User-Agent": "SingOfTheCross-HealthProbe/0.7.0"},
+        headers={"User-Agent": "SignOfTheCross-HealthProbe/0.7.0"},
         method="GET",
     )
     try:

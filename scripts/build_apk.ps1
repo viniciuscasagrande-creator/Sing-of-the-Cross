@@ -70,15 +70,15 @@ Write-Host "[5/6] APK empacotado e alinhado com zipalign."
 # 6. Gerar Keystore de producao SOTC e assinar APK (v1 + v2 + v3) com apksigner
 $keystore = Join-Path $mobile "sotc-release.keystore"
 if (-not (Test-Path $keystore)) {
-    & $keytool -genkeypair -v -keystore $keystore -alias sotckey -keyalg RSA -keysize 2048 -validity 10000 -storepass sotc123456 -keypass sotc123456 -dname "CN=Sing Of The Cross, OU=Multi-Cloud Command Center, O=SOTC, L=Curitiba, ST=PR, C=BR"
+    & $keytool -genkeypair -v -keystore $keystore -alias sotckey -keyalg RSA -keysize 2048 -validity 10000 -storepass sotc123456 -keypass sotc123456 -dname "CN=Sign Of The Cross, OU=Multi-Cloud Command Center, O=SOTC, L=Curitiba, ST=PR, C=BR"
 }
 
 $finalApkNamed = Join-Path $root "SOTC-Monitor-v1.0.0.apk"
-$finalApkRoot = Join-Path $root "SingOfTheCross.apk"
+$finalApkRoot = Join-Path $root "SignOfTheCross.apk"
 $finalApkAssetsNamed = Join-Path $root "frontend\assets\SOTC-Monitor-v1.0.0.apk"
-$finalApkAssets = Join-Path $root "frontend\assets\SingOfTheCross.apk"
+$finalApkAssets = Join-Path $root "frontend\assets\SignOfTheCross.apk"
 $finalApkDesktopNamed = "C:\Users\vinad\Desktop\SOTC-Monitor-v1.0.0.apk"
-$finalApkDesktop = "C:\Users\vinad\Desktop\SingOfTheCross.apk"
+$finalApkDesktop = "C:\Users\vinad\Desktop\SignOfTheCross.apk"
 
 & $apksigner sign --ks $keystore --ks-key-alias sotckey --ks-pass pass:sotc123456 --key-pass pass:sotc123456 --out $finalApkNamed $alignedApk
 & $apksigner verify --verbose $finalApkNamed

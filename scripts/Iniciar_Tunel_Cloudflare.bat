@@ -1,8 +1,8 @@
 @echo off
-title SING OF THE CROSS (SOTC) - Cloudflare Zero-Trust Tunnel (Opcao 2)
+title SIGN OF THE CROSS (SOTC) - Cloudflare Zero-Trust Tunnel (Opcao 2)
 cd /d "%~dp0.."
 echo =================================================================
-echo   SING OF THE CROSS - CLOUDFLARE TUNNEL PARA O COCKPIT LOCAL
+echo   SIGN OF THE CROSS - CLOUDFLARE TUNNEL PARA O COCKPIT LOCAL
 echo   Tunelando http://127.0.0.1:8765 via HTTPS seguro...
 echo =================================================================
 where cloudflared >nul 2>nul

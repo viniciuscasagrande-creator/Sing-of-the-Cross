@@ -1,4 +1,4 @@
-# SING OF THE CROSS (SOTC) — Dark Gothic Multi-Cloud Command Center
+# SIGN OF THE CROSS (SOTC) — Dark Gothic Multi-Cloud Command Center
 
 > **Cockpit Controlador de Voo • 7 Dashboards Executivos • Mapa de Dependências • Intervenção Rápida com 1 Clique**
 
@@ -7,9 +7,9 @@
 ## 1. Estrutura Organizada do Projeto
 
 ```text
-F:\Sing Of The Cross\
+F:\Sign Of The Cross\
 ├── app.py                        # Servidor HTTP principal + Worker Daemon 24/7 (porta 127.0.0.1:8765)
-├── SingOfTheCross.exe            # Aplicativo nativo Windows 11 (também na Área de Trabalho)
+├── SignOfTheCross.exe            # Aplicativo nativo Windows 11 (também na Área de Trabalho)
 ├── vms.json                      # Inventário local das máquinas virtuais (radar-producao)
 ├── vercel.json                   # Configuração Serverless da Vercel (Cloud Mirror)
 ├── GEMINI.md                     # Diretrizes oficiais e arquitetura do projeto
@@ -43,7 +43,7 @@ F:\Sing Of The Cross\
 │   ├── iniciar_sotc.bat          # Inicia o servidor local e abre o navegador
 │   ├── Iniciar_Sentinel_Agent.bat# Inicia o agente Sentinel dedicado em janela própria
 │   ├── Iniciar_Tunel_Cloudflare.bat # Abre túnel Cloudflare Zero-Trust
-│   └── launcher.cs               # Código-fonte C# do executável SingOfTheCross.exe
+│   └── launcher.cs               # Código-fonte C# do executável SignOfTheCross.exe
 │
 ├── docs/                         # Documentação de Engenharia e Referências
 │   ├── AUDITORIA_TECNICA_SOTC.md # Auditoria Técnica e Matriz de Implementação
@@ -57,7 +57,7 @@ F:\Sing Of The Cross\
 
 ## 2. Como Executar
 
-- **Pelo Aplicativo Windows 11**: Dê dois cliques em `SingOfTheCross.exe` (na raiz do projeto ou na sua Área de Trabalho).
+- **Pelo Aplicativo Windows 11**: Dê dois cliques em `SignOfTheCross.exe` (na raiz do projeto ou na sua Área de Trabalho).
 - **Via Script ou Terminal**: Execute `scripts\iniciar_sotc.bat` ou:
   ```powershell
   C:\laragon\bin\python\python-3.13\python.exe app.py

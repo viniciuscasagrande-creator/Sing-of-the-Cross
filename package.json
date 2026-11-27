@@ -1,7 +1,7 @@
 {
   "name": "sotc-monitor",
   "version": "1.0.0",
-  "description": "Sing Of The Cross (SOTC Monitor) - Multi-Cloud Command Center & Android APK",
+  "description": "Sign Of The Cross (SOTC Monitor) - Multi-Cloud Command Center & Android APK",
   "private": true,
   "scripts": {
     "start": "python app.py",

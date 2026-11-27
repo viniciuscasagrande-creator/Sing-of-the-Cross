@@ -1,4 +1,4 @@
-# SING OF THE CROSS (SOTC) — Auditoria Técnica Completa & Implementação Arquitetural
+# SIGN OF THE CROSS (SOTC) — Auditoria Técnica Completa & Implementação Arquitetural
 
 > **Status da Auditoria**: CONCLUÍDA E IMPLEMENTADA EM PRODUÇÃO LOCAL (`127.0.0.1:8765`) + CLOUD MIRROR (`Neon PostgreSQL` / `Vercel`)
 > **Identidade Visual**: `Dark Gothic Cinematic` (`#080808`, `#121216`, `#8B0000`, `#B91C1C`, `#A8A9AD`, `#E8E4DB`, `#B59B61`)
