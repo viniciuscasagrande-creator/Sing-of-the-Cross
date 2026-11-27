@@ -14,6 +14,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 import devcentral_bridge
+import oracle
 
 
 class handler(BaseHTTPRequestHandler):
@@ -51,6 +52,10 @@ class handler(BaseHTTPRequestHandler):
                 self.send_data(json.dumps(data, ensure_ascii=False).encode("utf-8"))
             elif path in ("/api/sentinel/heartbeat", "/api/sentinel/alerts", "/api/sentinel/telemetry"):
                 data = devcentral_bridge.fetch_sentinel_status()
+                self.send_data(json.dumps(data, ensure_ascii=False).encode("utf-8"))
+            elif path == "/api/oracle":
+                rows = devcentral_bridge.fetch_vm_snapshots_from_neon()
+                data = oracle.analyze_infrastructure(rows)
                 self.send_data(json.dumps(data, ensure_ascii=False).encode("utf-8"))
             elif path == "/api/aliases":
                 self.send_data(b'["radar-producao"]')

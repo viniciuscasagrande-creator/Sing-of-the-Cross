@@ -3,6 +3,7 @@ from pathlib import Path
 from discovery import aliases
 import guardian
 import reaper
+import oracle
 import devcentral_bridge
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse
@@ -108,7 +109,7 @@ class Handler(BaseHTTPRequestHandler):
     def send_data(self, data, kind='application/json',status=200):
         self.send_response(status); self.send_header('Content-Type',kind); self.send_header('Cache-Control','no-store'); self.send_header('X-Content-Type-Options','nosniff'); self.send_header('Content-Security-Policy',"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self'; frame-ancestors 'none'"); self.send_header('Content-Length',str(len(data))); self.end_headers(); self.wfile.write(data)
     def do_POST(self):
-        if self.path not in ('/api/inventory','/api/guardian','/api/reaper','/api/devcentral/health','/api/sentinel/run') or self.headers.get('Host') not in ('127.0.0.1:8765','localhost:8765') or self.headers.get('Origin') not in ('http://127.0.0.1:8765','http://localhost:8765') or self.headers.get('Content-Type') != 'application/json':
+        if self.path not in ('/api/inventory','/api/guardian','/api/reaper','/api/abyss','/api/devcentral/health','/api/sentinel/run') or self.headers.get('Host') not in ('127.0.0.1:8765','localhost:8765') or self.headers.get('Origin') not in ('http://127.0.0.1:8765','http://localhost:8765') or self.headers.get('Content-Type') != 'application/json':
             self.send_error(403); return
         try:
             n=int(self.headers.get('Content-Length','0'))
@@ -119,10 +120,12 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_data(json.dumps(sentinel.run_cycle(),ensure_ascii=False).encode()); return
             if self.path == '/api/devcentral/health':
                 self.send_data(json.dumps(devcentral_bridge.check_http_health(item.get('url','')),ensure_ascii=False).encode()); return
-            if self.path in ('/api/guardian','/api/reaper'):
+            if self.path in ('/api/guardian','/api/reaper','/api/abyss'):
                 vm=next((v for v in inventory() if v['ssh']==item.get('ssh')),None)
                 if vm is None: raise ValueError('VM não cadastrada')
-                if self.path == '/api/reaper':
+                if self.path == '/api/abyss':
+                    result=oracle.execute_abyss(vm,item)
+                elif self.path == '/api/reaper':
                     try:
                         result=reaper.execute(vm,item)
                     except (ValueError,OSError,subprocess.TimeoutExpired) as e:
@@ -154,6 +157,8 @@ class Handler(BaseHTTPRequestHandler):
             elif path=='/api/devcentral': self.send_data(json.dumps(devcentral_bridge.fetch_overview(),ensure_ascii=False).encode())
             elif path in ('/api/sentinel/heartbeat','/api/sentinel/alerts','/api/sentinel/telemetry'):
                 self.send_data(json.dumps(devcentral_bridge.fetch_sentinel_status(),ensure_ascii=False).encode())
+            elif path=='/api/oracle':
+                self.send_data(json.dumps(oracle.analyze_infrastructure(status()),ensure_ascii=False).encode())
             elif path=='/api/history': self.send_data(json.dumps(history(),ensure_ascii=False).encode())
             elif path=='/api/aliases': self.send_data(json.dumps(aliases()).encode())
             elif path=='/api/status':
