@@ -23,6 +23,7 @@ import android.os.Looper;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -59,8 +60,23 @@ public class MainActivity extends Activity {
 
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.setStatusBarColor(Color.parseColor("#080808"));
-        window.setNavigationBarColor(Color.parseColor("#121216"));
+        // Edge-to-Edge Real (Tela cheia imersiva com barras transparentes e tratamento de WindowInsets)
+        window.setStatusBarColor(Color.TRANSPARENT);
+        window.setNavigationBarColor(Color.TRANSPARENT);
+        if (Build.VERSION.SDK_INT >= 30) {
+            window.setDecorFitsSystemWindows(false);
+        } else {
+            window.getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+            );
+        }
+        if (Build.VERSION.SDK_INT >= 28) {
+            WindowManager.LayoutParams lp = window.getAttributes();
+            lp.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+            window.setAttributes(lp);
+        }
 
         createNotificationChannel();
 
@@ -70,17 +86,38 @@ public class MainActivity extends Activity {
         FrameLayout frameRoot = new FrameLayout(this);
         frameRoot.setBackgroundColor(Color.parseColor("#080808"));
 
-        // Container Principal Vertical (TopBar + OfflineBanner + WebView + BottomNav MD3)
-        LinearLayout mainColumn = new LinearLayout(this);
+        // Container Principal Vertical (AuthorBanner + TopBar + OfflineBanner + WebView + BottomNav MD3)
+        final LinearLayout mainColumn = new LinearLayout(this);
         mainColumn.setOrientation(LinearLayout.VERTICAL);
         mainColumn.setBackgroundColor(Color.parseColor("#080808"));
+
+        // 0. Faixa Superior de Autoria ("Desenvolvido por VINICIUS CASAGRANDE")
+        final LinearLayout authorHeader = new LinearLayout(this);
+        authorHeader.setOrientation(LinearLayout.HORIZONTAL);
+        authorHeader.setBackgroundColor(Color.parseColor("#0D0A0F"));
+        authorHeader.setGravity(Gravity.CENTER);
+        authorHeader.setPadding(24, 14, 24, 10);
+
+        TextView authorTxt = new TextView(this);
+        authorTxt.setText("\u2720 Desenvolvido por VINICIUS CASAGRANDE \u2720");
+        authorTxt.setTextColor(Color.parseColor("#B59B61"));
+        authorTxt.setTextSize(11.5f);
+        authorTxt.setTypeface(Typeface.SERIF, Typeface.BOLD);
+        authorTxt.setLetterSpacing(0.12f);
+        authorTxt.setGravity(Gravity.CENTER);
+        authorHeader.addView(authorTxt);
+
+        View authorDivider = new View(this);
+        authorDivider.setBackgroundColor(Color.parseColor("#57303A"));
+        authorDivider.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 1));
 
         // 1. Barra Superior Dark Gothic + Material Design 3
         LinearLayout topBar = new LinearLayout(this);
         topBar.setOrientation(LinearLayout.HORIZONTAL);
         topBar.setBackgroundColor(Color.parseColor("#121216"));
         topBar.setGravity(Gravity.CENTER_VERTICAL);
-        topBar.setPadding(28, 18, 28, 18);
+        topBar.setPadding(28, 14, 28, 14);
 
         TextView brand = new TextView(this);
         brand.setText("\u2720 SOTC MONITOR");
@@ -232,7 +269,7 @@ public class MainActivity extends Activity {
         bottomBorder.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, 2));
 
-        LinearLayout bottomNav = new LinearLayout(this);
+        final LinearLayout bottomNav = new LinearLayout(this);
         bottomNav.setOrientation(LinearLayout.HORIZONTAL);
         bottomNav.setBackgroundColor(Color.parseColor("#121216"));
         bottomNav.setGravity(Gravity.CENTER);
@@ -243,6 +280,20 @@ public class MainActivity extends Activity {
         bottomNav.addView(createBottomNavItem("\uD83D\uDEA8 Alertas", "#sentinel"));
         bottomNav.addView(createBottomNavItem("\u2630 Menu", "#sotc-suite"));
 
+        // Ajuste dinâmico de WindowInsets para Edge-to-Edge (evita sobreposição com câmera/notch e barra de gestos)
+        frameRoot.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
+            @Override
+            public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
+                int topInset = insets.getSystemWindowInsetTop();
+                int bottomInset = insets.getSystemWindowInsetBottom();
+                authorHeader.setPadding(24, Math.max(14, topInset + 10), 24, 10);
+                bottomNav.setPadding(12, 14, 12, Math.max(16, bottomInset + 12));
+                return insets;
+            }
+        });
+
+        mainColumn.addView(authorHeader);
+        mainColumn.addView(authorDivider);
         mainColumn.addView(topBar);
         mainColumn.addView(topBorder);
         mainColumn.addView(offlineBanner);
@@ -297,13 +348,22 @@ public class MainActivity extends Activity {
         sub.setTextColor(Color.parseColor("#B59B61"));
         sub.setTextSize(11.5f);
         sub.setGravity(Gravity.CENTER);
-        sub.setPadding(0, 10, 0, 36);
+        sub.setPadding(0, 10, 0, 12);
+
+        TextView devSplash = new TextView(this);
+        devSplash.setText("Desenvolvido por VINICIUS CASAGRANDE");
+        devSplash.setTextColor(Color.parseColor("#E8E4DB"));
+        devSplash.setTextSize(12.5f);
+        devSplash.setTypeface(Typeface.SERIF, Typeface.BOLD);
+        devSplash.setGravity(Gravity.CENTER);
+        devSplash.setPadding(0, 0, 0, 36);
 
         ProgressBar spinner = new ProgressBar(this);
 
         splash.addView(logoImg);
         splash.addView(title);
         splash.addView(sub);
+        splash.addView(devSplash);
         splash.addView(spinner);
         return splash;
     }
