@@ -1,8 +1,8 @@
 @echo off
-title SING OF THE CROSS (SOTC) - Dark Gothic Cinematic Edition (V0.5 The Guardian)
+title SING OF THE CROSS (SOTC) - V0.6 The Reaper + V0.6.5 The Convergence
 cd /d "%~dp0"
 echo =================================================================
-echo   SING OF THE CROSS - DARK GOTHIC CINEMATIC EDITION (V0.5)
+echo   SING OF THE CROSS - V0.6 THE REAPER + DEVCENTRAL CONVERGENCE
 echo   URL: http://127.0.0.1:8765
 echo =================================================================
 start "" "http://127.0.0.1:8765"

@@ -16,3 +16,6 @@ V0.6 The Reaper: terminal e gerenciamento avançado, energia das VMs com autoriz
 
 ## Segurança
 Localhost somente. Não armazenar credenciais. Permissões mínimas, ações críticas confirmadas, sem agentes ou alterações automáticas em produção. Validar em VM de testes antes de intervenções reais.
+
+## V0.6 — THE REAPER
+Tema Dark Gothic Cinematic reforçado no código; console de diagnóstico controlado e terminal SSH externo; energia multi-cloud com habilitação por VM e confirmação. Terminal web interativo, gestão de processos por PID, snapshots e integração DevCentral continuam planejados. Testes de sintaxe e operações simuladas concluídos; validação real no Windows pendente.

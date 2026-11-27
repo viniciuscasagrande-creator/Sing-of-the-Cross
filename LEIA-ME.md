@@ -20,3 +20,11 @@ Reiniciar serviço é opcional e altera a VM Linux: informe uma unidade systemd 
 Validação: sintaxe Python/JS, montagem dos quatro comandos CLI, rejeição de confirmação incorreta e auditoria com execução simulada. Windows, cloud, SSH e reinício real não testados. Os diagnósticos dependem dos utilitários Linux e permissões disponíveis.
 
 Migração: após encerrar a versão anterior, preserve uma cópia de vms.json e history.sqlite3, caso existam, e copie-os para a pasta nova para manter seu inventário e histórico. Não substitua sua configuração SSH.
+
+## V0.6 — The Reaper
+
+Execute `Iniciar_SOTC.bat` no Windows local ou `py -3 app.py` no terminal local do VS Code. Abra http://127.0.0.1:8765. A versão inclui `gothic.css` com ornamentos, anéis metálicos, menu de módulos e névoa discreta (respeita redução de movimento). A seção The Reaper tem console de diagnósticos predefinidos e abertura de uma janela SSH interativa externa no Windows. Não é um terminal interativo embutido no navegador.
+
+Energia bloqueada por padrão. Para permitir em uma VM, edite seu objeto em `vms.json` e acrescente `"allow_power": true` após revisar os identificadores, credenciais, permissões e impactos. Digite o alias e a ação conforme solicitado. GCP reboot usa reset forçado; Azure stop usa deallocate; OCI usa SOFTSTOP/SOFTRESET. Não há snapshot ou rollback automático. Em caso de timeout, consulte o estado real antes de repetir. CLI precisa estar instalada e autenticada. Auditoria registra o resultado da solicitação, não necessariamente o estado final da VM. Não exponha a porta local na internet. Não copie credenciais para o projeto.
+
+Para atualizar, preserve uma cópia de `vms.json` e `history.sqlite3` da versão anterior. A integração DevCentral permanece separada; não foi implementada nesta versão. Nenhuma operação real de energia foi executada durante os testes.
