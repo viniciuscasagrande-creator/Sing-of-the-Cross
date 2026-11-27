@@ -1,5 +1,5 @@
 __pycache__/
-*.pyc
+*.sqlite3*
+.env
+vms.json
 .venv/
-node_modules/
-.test_write

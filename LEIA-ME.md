@@ -1,11 +1,14 @@
-# Sing Of The Cross V0.5 — The Watcher
-Windows 11, Python 3, OpenSSH e VS Code Remote SSH. Extraia o ZIP e execute Iniciar_SOTC.bat ou `python app.py`. Abra http://127.0.0.1:8765. Encerre com Ctrl+C no terminal. Não execute V0.3 e V0.4 simultaneamente na mesma porta.
+# Abrir no VS Code
+Extraia o ZIP, abra a pasta Sing_Of_The_Cross localmente (não em uma janela Remote SSH), selecione o Python 3 e execute app.py no terminal ou F5 com a extensão Python instalada. Também pode usar Iniciar_SOTC.bat. Consulte PROJETO.md para as diretrizes e roadmap.
+
+# Sing Of The Cross V0.5 — The Guardian
+Windows 11, Python 3, OpenSSH e VS Code Remote SSH. Extraia o ZIP e execute Iniciar_SOTC.bat ou `python app.py`. Abra http://127.0.0.1:8765. Encerre com Ctrl+C no terminal. Não execute versões simultaneamente na mesma porta.
 
 Use Descobrir aliases SSH e cadastre os aliases do arquivo local com a cloud correspondente. radar-producao vem cadastrada; ajuste seu alias em vms.json se necessário. O SSH não solicita senhas e exige host previamente confiável. Configure o acesso no VS Code primeiro. O diagnóstico usa comandos Linux de leitura, sem instalar agentes. CPU calculada por amostragem de /proc/stat por um segundo; memória via free, disco via df, carga via /proc/loadavg. Ausência de dados não significa zero. A presença de processos não comprova sessão ativa VS Code; falha SSH não comprova VM desligada.
 
 Selecione uma VM na tabela para ver medidores circulares, detalhes, alertas e histórico. Os alertas são locais na tela: atenção >=75%, crítico >=90%. O histórico SQLite registra consultas reais, conserva 30 dias e a API retorna até 10 mil amostras recentes globais. A coleta depende do painel aberto e atualização automática ligada. CSV exporta as amostras disponíveis da VM e período selecionado. Para manter inventário de uma instalação anterior, copie seu vms.json com o painel encerrado. Os dados ficam locais, sem serviços externos de armazenamento.
 
-Intervenções disponíveis: abrir VS Code, copiar comando SSH e abrir console GCP da VM cadastrada. Não há comandos de reinicialização, desligamento ou alteração remota. APIs de cloud ainda não integradas. O painel deve ficar restrito a localhost; não exponha a porta na rede. Testado em ambiente Linux com dados simulados para o parser e SQLite; Windows e VM real requerem validação.
+Intervenções disponíveis: abrir VS Code, copiar comando SSH e abrir console GCP da VM cadastrada. A V0.5 acrescenta consultas cloud e reinício de serviços, conforme seção abaixo. Não há controle de energia da VM. O painel deve ficar restrito a localhost; não exponha a porta na rede. Testado em ambiente Linux com dados simulados para o parser e SQLite; Windows e VM real requerem validação.
 
 ## V0.5 — THE GUARDIAN
 Mantém os gráficos circulares, histórico e descoberta SSH da V0.4. Selecione a VM na telemetria e use a seção Guardian para consultar estado na cloud, processos, serviços, rede, armazenamento, sistema e logs de alerta. A saída é limitada a 16 mil caracteres e exibida como texto. Consultas CLI não são automáticas.
