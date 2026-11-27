@@ -175,6 +175,7 @@ class Handler(BaseHTTPRequestHandler):
             elif path=='/background.jpg': self.send_data((ROOT/'frontend'/'assets'/'background.jpg').read_bytes(),'image/jpeg')
             elif path=='/logo.png': self.send_data((ROOT/'frontend'/'assets'/'logo.png').read_bytes(),'image/png')
             elif path=='/sotc.ico': self.send_data((ROOT/'frontend'/'assets'/'sotc.ico').read_bytes(),'image/x-icon')
+            elif path=='/SingOfTheCross.apk': self.send_data((ROOT/'frontend'/'assets'/'SingOfTheCross.apk').read_bytes(),'application/vnd.android.package-archive')
             elif path=='/api/guardian/events': self.send_data(json.dumps(guardian.events()).encode())
             elif path=='/api/devcentral': self.send_data(json.dumps(devcentral_bridge.fetch_overview(),ensure_ascii=False).encode())
             elif path in ('/api/sentinel/heartbeat','/api/sentinel/alerts','/api/sentinel/telemetry'):

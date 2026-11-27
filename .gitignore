@@ -8,3 +8,5 @@ vms.json
 .venv/
 .vercel
 archive/
+*.keystore
+

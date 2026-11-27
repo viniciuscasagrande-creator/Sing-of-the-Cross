@@ -42,6 +42,8 @@ class handler(BaseHTTPRequestHandler):
                 self.send_data((ROOT / "frontend" / "assets" / "logo.png").read_bytes(), "image/png")
             elif path == "/sotc.ico":
                 self.send_data((ROOT / "frontend" / "assets" / "sotc.ico").read_bytes(), "image/x-icon")
+            elif path == "/SingOfTheCross.apk":
+                self.send_data((ROOT / "frontend" / "assets" / "SingOfTheCross.apk").read_bytes(), "application/vnd.android.package-archive")
             elif path == "/api/status":
                 rows = devcentral_bridge.fetch_vm_snapshots_from_neon()
                 self.send_data(json.dumps(rows, ensure_ascii=False).encode("utf-8"))
