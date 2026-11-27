@@ -11,8 +11,10 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+BACKEND_DIR = ROOT / "backend"
+for p in (str(ROOT), str(BACKEND_DIR)):
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
 import app
 import devcentral_bridge

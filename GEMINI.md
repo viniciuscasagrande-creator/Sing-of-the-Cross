@@ -38,7 +38,48 @@ Todas as telas, módulos e componentes do **Sing Of The Cross (SOTC)** devem seg
 - **Botões & Barras de Rolagem**: Metálicos com bordas carmesim; scrollbars em preto metálico e vermelho.
 - **Janelas de Confirmação (`Guardian Security Protocol` + Impact Preview)**: Sempre usar modais `<dialog>` góticos (nunca `prompt()` nativo do navegador) com Pré-Visualização de Impacto (*Blast Radius*), confirmação digitada (`<alias> <acao>`) e cooldown anti-repetição validado no servidor (`check_rate_limit`).
 
-## 2. Nomes Oficiais dos Módulos Internos
+## 2. Estrutura Modular de Pastas do Projeto
+```text
+F:\Sing Of The Cross\
+├── app.py                        # Servidor HTTP principal + Worker Daemon 24/7 (porta 127.0.0.1:8765)
+├── SingOfTheCross.exe            # Launcher nativo Windows 11
+├── vms.json                      # Inventário local das máquinas virtuais
+├── vercel.json                   # Roteamento Serverless para deploy Cloud Mirror na Vercel
+├── GEMINI.md                     # Diretrizes oficiais e regras permanentes do projeto
+├── LEIA-ME.md                    # Guia rápido de uso e arquitetura
+├── api/
+│   └── index.py                  # Handler Serverless da Vercel (Cloud Mirror integrado ao Neon)
+├── backend/
+│   ├── __init__.py
+│   ├── discovery.py              # Auto-descoberta de hosts em ~/.ssh/config
+│   ├── guardian.py               # Sonda SSH, Cloud CLI, RBAC rate-limit e auditoria
+│   ├── reaper.py                 # Diagnósticos Linux e controle de energia seguro
+│   ├── oracle.py                 # Motor dos 7 Dashboards SOTC, FinOps, AI e Mapa de Dependências
+│   └── devcentral_bridge.py      # Conector HTTP Neon PostgreSQL, 42 projetos DevCentral e Rollups
+├── frontend/
+│   ├── index.html                # Interface Dark Gothic (Cockpit Flight Deck + 7 Dashboards + 1-Click)
+│   ├── gothic.css                # Folha de estilos Dark Gothic Cinematic
+│   └── assets/                   # Logos, ícones e backgrounds (logo.png, background.jpg, sotc.ico)
+├── agent/
+│   ├── sentinel.py               # Agente de monitoramento contínuo Windows 11 -> Neon PostgreSQL
+│   ├── config.example.json       # Limites de alerta (75% warn / 90% crit)
+│   └── install.ps1               # Instalador de tarefa agendada no Windows
+├── database/
+│   ├── sentinel.sql              # Schema completo do Neon PostgreSQL (Rollups, Incidentes, SSL, DR)
+│   └── history.sqlite3           # Banco local SQLite de baixa latência
+├── scripts/
+│   ├── iniciar_sotc.bat          # Inicializador rápido do Cockpit local
+│   ├── Iniciar_Sentinel_Agent.bat# Inicializador do Agente Sentinel 24/7
+│   ├── Iniciar_Tunel_Cloudflare.bat # Túnel HTTPS Zero-Trust opcional
+│   └── launcher.cs               # Código-fonte C# do SingOfTheCross.exe
+├── docs/
+│   ├── AUDITORIA_TECNICA_SOTC.md # Relatório completo de auditoria e arquitetura
+│   ├── PROJETO.md                # Roadmap e especificações históricas
+│   └── referencias-visuais/      # Artes conceituais Dark Gothic Cinematic
+└── archive/                      # Histórico de pacotes anteriores (v0.1 a v0.6, ignorado no Git)
+```
+
+## 3. Nomes Oficiais dos Módulos Internos
 - **The Cathedral**: Dashboard principal
 - **The Watcher**: Monitoramento em tempo real
 - **The Guardian**: Segurança e intervenções

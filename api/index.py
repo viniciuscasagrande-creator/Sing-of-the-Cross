@@ -10,8 +10,10 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parent.parent
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+BACKEND_DIR = ROOT / "backend"
+for p in (str(ROOT), str(BACKEND_DIR)):
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
 import devcentral_bridge
 import oracle
@@ -31,13 +33,15 @@ class handler(BaseHTTPRequestHandler):
         path = urlparse(self.path).path
         try:
             if path in ("/", "/index.html"):
-                self.send_data((ROOT / "index.html").read_bytes(), "text/html; charset=utf-8")
+                self.send_data((ROOT / "frontend" / "index.html").read_bytes(), "text/html; charset=utf-8")
             elif path == "/gothic.css":
-                self.send_data((ROOT / "gothic.css").read_bytes(), "text/css; charset=utf-8")
+                self.send_data((ROOT / "frontend" / "gothic.css").read_bytes(), "text/css; charset=utf-8")
             elif path == "/background.jpg":
-                self.send_data((ROOT / "background.jpg").read_bytes(), "image/jpeg")
+                self.send_data((ROOT / "frontend" / "assets" / "background.jpg").read_bytes(), "image/jpeg")
             elif path == "/logo.png":
-                self.send_data((ROOT / "logo.png").read_bytes(), "image/png")
+                self.send_data((ROOT / "frontend" / "assets" / "logo.png").read_bytes(), "image/png")
+            elif path == "/sotc.ico":
+                self.send_data((ROOT / "frontend" / "assets" / "sotc.ico").read_bytes(), "image/x-icon")
             elif path == "/api/status":
                 rows = devcentral_bridge.fetch_vm_snapshots_from_neon()
                 self.send_data(json.dumps(rows, ensure_ascii=False).encode("utf-8"))

@@ -1,8 +1,10 @@
 __pycache__/
+*.pyc
 *.sqlite3*
+*.db
 .env
+.env*
 vms.json
 .venv/
-
 .vercel
-.env*
+archive/

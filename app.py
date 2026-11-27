@@ -1,13 +1,16 @@
-import sqlite3, datetime, json, re, shutil, subprocess, concurrent.futures, time, os, threading
+import sqlite3, datetime, json, re, shutil, subprocess, concurrent.futures, time, os, threading, sys
 from pathlib import Path
+from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
+from urllib.parse import urlparse
+ROOT=Path(__file__).resolve().parent
+BACKEND_DIR=ROOT/'backend'
+if str(BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(BACKEND_DIR))
 from discovery import aliases
 import guardian
 import reaper
 import oracle
 import devcentral_bridge
-from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
-from urllib.parse import urlparse
-ROOT=Path(__file__).resolve().parent
 
 def inventory():
     data=json.loads((ROOT/'vms.json').read_text(encoding='utf-8'))
@@ -43,7 +46,7 @@ def local_evidence(alias, processes):
 LOCK=threading.Lock()
 CACHE=None
 LAST=0
-DB=ROOT/'history.sqlite3'
+DB=ROOT/'database'/'history.sqlite3'
 def record(rows):
     with sqlite3.connect(DB) as db:
         db.execute('CREATE TABLE IF NOT EXISTS samples (ts INTEGER, alias TEXT, payload TEXT)')
@@ -167,10 +170,11 @@ class Handler(BaseHTTPRequestHandler):
             self.send_error(403); return
         path=urlparse(self.path).path
         try:
-            if path=='/': self.send_data((ROOT/'index.html').read_bytes(),'text/html; charset=utf-8')
-            elif path=='/gothic.css': self.send_data((ROOT/'gothic.css').read_bytes(),'text/css; charset=utf-8')
-            elif path=='/background.jpg': self.send_data((ROOT/'background.jpg').read_bytes(),'image/jpeg')
-            elif path=='/logo.png': self.send_data((ROOT/'logo.png').read_bytes(),'image/png')
+            if path=='/': self.send_data((ROOT/'frontend'/'index.html').read_bytes(),'text/html; charset=utf-8')
+            elif path=='/gothic.css': self.send_data((ROOT/'frontend'/'gothic.css').read_bytes(),'text/css; charset=utf-8')
+            elif path=='/background.jpg': self.send_data((ROOT/'frontend'/'assets'/'background.jpg').read_bytes(),'image/jpeg')
+            elif path=='/logo.png': self.send_data((ROOT/'frontend'/'assets'/'logo.png').read_bytes(),'image/png')
+            elif path=='/sotc.ico': self.send_data((ROOT/'frontend'/'assets'/'sotc.ico').read_bytes(),'image/x-icon')
             elif path=='/api/guardian/events': self.send_data(json.dumps(guardian.events()).encode())
             elif path=='/api/devcentral': self.send_data(json.dumps(devcentral_bridge.fetch_overview(),ensure_ascii=False).encode())
             elif path in ('/api/sentinel/heartbeat','/api/sentinel/alerts','/api/sentinel/telemetry'):
