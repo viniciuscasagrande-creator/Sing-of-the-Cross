@@ -2,6 +2,7 @@ import sqlite3, datetime, json, re, shutil, subprocess, concurrent.futures, time
 from pathlib import Path
 from discovery import aliases
 import guardian
+import devcentral_bridge
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse
 ROOT=Path(__file__).resolve().parent
@@ -102,12 +103,14 @@ class Handler(BaseHTTPRequestHandler):
     def send_data(self, data, kind='application/json',status=200):
         self.send_response(status); self.send_header('Content-Type',kind); self.send_header('Cache-Control','no-store'); self.send_header('X-Content-Type-Options','nosniff'); self.send_header('Content-Security-Policy',"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self'; frame-ancestors 'none'"); self.send_header('Content-Length',str(len(data))); self.end_headers(); self.wfile.write(data)
     def do_POST(self):
-        if self.path not in ('/api/inventory','/api/guardian') or self.headers.get('Host') not in ('127.0.0.1:8765','localhost:8765') or self.headers.get('Origin') not in ('http://127.0.0.1:8765','http://localhost:8765') or self.headers.get('Content-Type') != 'application/json':
+        if self.path not in ('/api/inventory','/api/guardian','/api/devcentral/health') or self.headers.get('Host') not in ('127.0.0.1:8765','localhost:8765') or self.headers.get('Origin') not in ('http://127.0.0.1:8765','http://localhost:8765') or self.headers.get('Content-Type') != 'application/json':
             self.send_error(403); return
         try:
             n=int(self.headers.get('Content-Length','0'))
             if not 0<n<4096: raise ValueError('Tamanho inválido')
             item=json.loads(self.rfile.read(n))
+            if self.path == '/api/devcentral/health':
+                self.send_data(json.dumps(devcentral_bridge.check_http_health(item.get('url','')),ensure_ascii=False).encode()); return
             if self.path == '/api/guardian':
                 vm=next((v for v in inventory() if v['ssh']==item.get('ssh')),None)
                 if vm is None: raise ValueError('VM não cadastrada')
@@ -131,6 +134,7 @@ class Handler(BaseHTTPRequestHandler):
             elif path=='/background.jpg': self.send_data((ROOT/'background.jpg').read_bytes(),'image/jpeg')
             elif path=='/logo.png': self.send_data((ROOT/'logo.png').read_bytes(),'image/png')
             elif path=='/api/guardian/events': self.send_data(json.dumps(guardian.events()).encode())
+            elif path=='/api/devcentral': self.send_data(json.dumps(devcentral_bridge.fetch_overview(),ensure_ascii=False).encode())
             elif path=='/api/history': self.send_data(json.dumps(history(),ensure_ascii=False).encode())
             elif path=='/api/aliases': self.send_data(json.dumps(aliases()).encode())
             elif path=='/api/status':
